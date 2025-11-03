@@ -1,6 +1,6 @@
 package com.example.coffeeshop.ui.activity
 
-import android.content.Intent // <-- THÊM IMPORT NÀY
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -9,55 +9,62 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coffeeshop.R
 import com.example.coffeeshop.data.dao.UserDAO
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import okhttp3.Response // <-- THÊM IMPORT NÀY
 import org.json.JSONObject
-import java.io.IOException
 
 class LoginActivity : AppCompatActivity() {
+
+    // Hardcoded user info
+    private val hardcodedUsername = "admin"
+    private val hardcodedPassword = "1234"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Bỏ btnLoginTab và btnSignUpTab vì không có trong layout của bạn
         val etUsername = findViewById<EditText>(R.id.etUsername)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val tvForgot = findViewById<TextView>(R.id.tvForgot)
 
         btnLogin.setOnClickListener {
-            val username = etUsername.text.toString()
-            val password = etPassword.text.toString()
+            val username = etUsername.text.toString().trim()
+            val password = etPassword.text.toString().trim()
 
             if (username.isBlank() || password.isBlank()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Gọi hàm checkLogin trong UserDAO
-            UserDAO.checkLogin(username, password) { success, message, user ->
-                runOnUiThread {
-                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            // 🔹 Check if login matches the hardcoded user
+            if (username == hardcodedUsername && password == hardcodedPassword) {
+                val user = JSONObject().apply {
+                    put("username", username)
+                }
 
-                    if (success && user != null) {
-                        val intent = Intent(this, MainActivity::class.java)
-                        intent.putExtra("username", user.optString("username"))
-                        startActivity(intent)
-                        finish()
+                Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("username", user.optString("username"))
+                startActivity(intent)
+                finish()
+            } else {
+                // 🔹 Otherwise, fallback to your DAO login check
+                UserDAO.checkLogin(username, password) { success, message, user ->
+                    runOnUiThread {
+                        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+                        if (success && user != null) {
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.putExtra("username", user.optString("username"))
+                            startActivity(intent)
+                            finish()
+                        }
                     }
                 }
             }
         }
 
         tvForgot.setOnClickListener {
-            // TODO: Chuyển sang màn hình quên mật khẩu
+            Toast.makeText(this, "Forgot password clicked!", Toast.LENGTH_SHORT).show()
         }
-
-        // Không có btnSignUpTab trong layout của bạn, có thể bạn muốn xử lý cho một TextView khác
     }
 }
