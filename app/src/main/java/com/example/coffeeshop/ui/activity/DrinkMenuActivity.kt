@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coffeeshop.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DrinkMenuActivity : AppCompatActivity() {
 
@@ -14,6 +15,7 @@ class DrinkMenuActivity : AppCompatActivity() {
     private lateinit var btnCoffee: Button
     private lateinit var btnChocolate: Button
     private lateinit var btnOthers: Button
+    private lateinit var fabAddOrder1: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,12 +25,17 @@ class DrinkMenuActivity : AppCompatActivity() {
         btnCoffee = findViewById(R.id.btnCoffee)
         btnChocolate = findViewById(R.id.btnChocolate)
         btnOthers = findViewById(R.id.btnOthers)
+        fabAddOrder1 = findViewById(R.id.fabAddOrder1)
 
         setupBottomNavigationView()
         setupFilterButtons()
 
         // Simulate clicking the Coffee button initially
         btnCoffee.performClick()
+
+        fabAddOrder1.setOnClickListener {
+            Toast.makeText(this, "Coffee selected", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupBottomNavigationView() {

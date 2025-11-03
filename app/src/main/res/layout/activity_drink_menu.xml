@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF9F1"
+    android:background="@color/creamy_white"
     tools:context=".ui.activity.DrinkMenuActivity">
 
     <!-- Top Bar -->
@@ -130,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="12dp"
-                app:cardBackgroundColor="#F2EFEA">
+                app:cardBackgroundColor="@color/creamy_white">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -176,23 +176,26 @@
                         android:id="@+id/tvDrinkItemPrice1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="4dp"
                         android:text="Rp 20.000"
                         android:textColor="@color/dark_brown"
                         android:textSize="14sp"
-                        android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@+id/ivDrinkItemImage1"
-                        app:layout_constraintTop_toBottomOf="@+id/tvDrinkItemDescription1" />
+                        app:layout_constraintTop_toBottomOf="@+id/tvDrinkItemTitle1" />
 
-                    <ImageButton
-                        android:id="@+id/btnAdd1"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_button_rounded"
-                        android:src="@drawable/ic_add"
-                        app:tint="@color/white"
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fabAddOrder1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:backgroundTint="@color/brown"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:srcCompat="@drawable/ic_add" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
