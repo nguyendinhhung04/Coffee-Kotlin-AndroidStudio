@@ -33,7 +33,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="12dp"/>
 
-    <!-- Card Login -->
+    <!-- Card chứa Tab + Fragment -->
     <LinearLayout
         android:id="@+id/loginCard"
         android:layout_width="0dp"
@@ -72,52 +72,15 @@
                 android:textColor="@android:color/white"/>
         </LinearLayout>
 
-        <!-- Username -->
-        <EditText
-            android:id="@+id/etUsername"
+        <!-- Fragment hiển thị form -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/authFragmentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username or Email"
+            app:layout_constraintTop_toBottomOf="@id/loginCard"
+            app:defaultNavHost="false"
             android:layout_marginTop="16dp"
-            android:inputType="textEmailAddress"
-            android:backgroundTint="@color/brown"
-            android:fontFamily="@font/inter"/>
-
-        <!-- Password -->
-        <EditText
-            android:id="@+id/etPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:layout_marginTop="12dp"
-            android:inputType="textPassword"
-            android:backgroundTint="@color/brown"
-            android:fontFamily="@font/inter"/>
-
-        <!-- Forgot password -->
-        <TextView
-            android:id="@+id/tvForgot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Forgot password?"
-            android:textColor="@color/brownMedium"
-            android:layout_gravity="end"
-            android:layout_marginTop="8dp"/>
-
-        <!-- Nút Login -->
-        <!-- Thay thế android.widget.Button bằng cái này -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Login"
-            android:layout_marginTop="20dp"
-            android:textColor="@android:color/white"
-            android:fontFamily="@font/inter"
-            app:backgroundTint="@color/brown"
-            app:cornerRadius="20dp" /> <!-- Sử dụng cornerRadius để bo tròn góc -->
-
-
+            android:name="com.example.coffeeshop.ui.fragment.LoginFragment"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
