@@ -18,22 +18,31 @@
             android:name=".ui.activity.LoginActivity"
             android:exported="true">  <!-- android:exported="true" là bắt buộc cho các app nhắm đến API 31+ -->
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
         </activity>
 
         <!-- Các activity khác (nếu có) sẽ không có intent-filter này -->
         <!-- Khai báo MainActivity -->
         <activity
             android:name=".ui.activity.MainActivity"
+            android:exported="true"> <!-- Đặt true vì nó là điểm khởi chạy -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.activity.DrinkMenuActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.activity.RegisterActivity"
+            android:name=".ui.activity.YourOrderActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:exported="false" />
+
 
     </application>
 
