@@ -13,24 +13,23 @@
         android:theme="@style/Theme.CoffeeShop"
         tools:targetApi="31">
 
-        <!-- ĐẢM BẢO KHỐI NÀY TỒN TẠI CHO ACTIVITY CHÍNH CỦA BẠN -->
+        <!-- Đặt LoginActivity làm màn hình khởi chạy -->
         <activity
             android:name=".ui.activity.LoginActivity"
-            android:exported="false">  <!-- Đặt false vì nó không còn là điểm khởi chạy -->
-
-        </activity>
-
-        <!-- Các activity khác (nếu có) sẽ không có intent-filter này -->
-        <!-- Khai báo MainActivity -->
-        <activity
-            android:name=".ui.activity.MainActivity"
-            android:exported="true"> <!-- Đặt true vì nó là điểm khởi chạy -->
+            android:exported="true">
+            <!-- DI CHUYỂN INTENT-FILTER VÀO ĐÂY -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Xóa intent-filter khỏi MainActivity và đặt exported="false" -->
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:exported="false" />
+
+        <!-- Các activity khác -->
         <activity
             android:name=".ui.activity.DrinkMenuActivity"
             android:exported="false" />
@@ -43,7 +42,7 @@
             android:name=".ui.activity.FavoritesActivity"
             android:exported="false" />
 
+
     </application>
 
 </manifest>
-    
