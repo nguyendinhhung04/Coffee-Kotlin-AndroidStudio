@@ -4,20 +4,54 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coffeeshop.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.widget.Toast
+import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Tạo một layout đơn giản cho MainActivity
-        // Bạn có thể tạo file layout riêng (activity_main.xml) và dùng setContentView(R.layout.activity_main)
         setContentView(R.layout.activity_main)
 
-        val tvWelcome = findViewById<TextView>(R.id.tvWelcome)
-
-        // Nhận username được gửi từ LoginActivity
+        val tvGreeting = findViewById<TextView>(R.id.tvGreeting)
         val username = intent.getStringExtra("username")
 
-        // Hiển thị lời chào
-        tvWelcome.text = "Welcome, $username!"
+        if (username != null) {
+            tvGreeting.text = "Good day, $username"
+        } else {
+            tvGreeting.text = "Good day, John Smith"
+        }
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNavigationView.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.navigation_home -> {
+                    // Already on Home, do nothing or re-initialize
+                    true
+                }
+                R.id.navigation_drink_menu -> {
+                    val intent = Intent(this, DrinkMenuActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                    true
+                }
+                R.id.navigation_your_order -> {
+                    val intent = Intent(this, YourOrderActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                    true
+                }
+                R.id.navigation_favorites -> {
+                    val intent = Intent(this, FavoritesActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                    true
+                }
+                else -> false
+            }
+        }
+        // Đặt mục Home được chọn mặc định
+        bottomNavigationView.selectedItemId = R.id.navigation_home
+
     }
 }

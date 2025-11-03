@@ -16,12 +16,7 @@
         <!-- ĐẢM BẢO KHỐI NÀY TỒN TẠI CHO ACTIVITY CHÍNH CỦA BẠN -->
         <activity
             android:name=".ui.activity.LoginActivity"
-            android:exported="true">  <!-- android:exported="true" là bắt buộc cho các app nhắm đến API 31+ -->
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:exported="false">  <!-- Đặt false vì nó không còn là điểm khởi chạy -->
 
         </activity>
 
@@ -29,8 +24,24 @@
         <!-- Khai báo MainActivity -->
         <activity
             android:name=".ui.activity.MainActivity"
+            android:exported="true"> <!-- Đặt true vì nó là điểm khởi chạy -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.activity.DrinkMenuActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.activity.YourOrderActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.FavoritesActivity"
+            android:exported="false" />
 
     </application>
 

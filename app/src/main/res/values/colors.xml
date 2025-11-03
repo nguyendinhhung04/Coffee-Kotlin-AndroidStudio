@@ -8,10 +8,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="light_brown_primary">#D2B48C</color> <!-- Light brown for primary color -->
+    <color name="light_brown_primary_variant">#C0A080</color> <!-- Slightly darker light brown for primary variant -->
+    <color name="creamy_white">#FFF9F1</color> <!-- Creamy white for backgrounds -->
+
     <color name="brown">#5B3921</color> <!-- nâu đậm -->
     <color name="brownMedium">#A47F5B</color>
     <color name="backgroundLight">#F5E0B5</color>
-
+    <color name="dark_brown">#654321</color>
 
 
 </resources>
