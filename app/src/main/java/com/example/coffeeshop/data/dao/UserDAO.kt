@@ -43,4 +43,40 @@ object UserDAO {
             }
         })
     }
+
+    fun registerUser(fullName: String, email: String,phone: String, username: String, password: String, callback: (Boolean, String) -> Unit) {
+        val client = OkHttpClient()
+        val json = JSONObject()
+        json.put("name", fullName)
+        json.put("username", username)
+        json.put("password", password)
+        json.put("email", email)
+        json.put("phone", phone)
+
+
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = RequestBody.create(mediaType, json.toString())
+
+        val request = Request.Builder()
+            .url("$BASE_URL/register")
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: okhttp3.Call, e: IOException) {
+                callback(false, "Network error: ${e.message}")
+            }
+
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                val bodyStr = response.body?.string()
+                if (response.isSuccessful) {
+                    callback(true, "Register success")
+                } else {
+                    callback(false, "Register failed: $bodyStr")
+                }
+            }
+        })
+    }
+
+
 }
