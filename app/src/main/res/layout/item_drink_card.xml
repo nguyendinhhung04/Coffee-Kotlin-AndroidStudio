@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#FFFFFF">
+
+        <ImageView
+            android:id="@+id/ivDrinkImage"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_coffee"
+            android:contentDescription="Hình món" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tvDrinkName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cà phê Sữa Đá"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#3E2723"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/tvDrinkPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="29.000đ"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#D84315"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

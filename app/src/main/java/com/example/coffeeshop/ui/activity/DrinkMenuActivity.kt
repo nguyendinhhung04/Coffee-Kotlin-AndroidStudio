@@ -1,170 +1,210 @@
-
 package com.example.coffeeshop.ui.activity
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.example.coffeeshop.R
-import com.example.coffeeshop.data.api.ApiClient
+import com.example.coffeeshop.data.dao.ItemDAO
 import com.example.coffeeshop.data.model.Item
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import org.json.JSONArray
+import java.net.URL
 
 class DrinkMenuActivity : AppCompatActivity() {
 
-    private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var btnCoffee: Button
-    private lateinit var btnChocolate: Button
+    private lateinit var btnTea: Button
+    private lateinit var btnCake: Button
     private lateinit var btnOthers: Button
-    private lateinit var fabAddOrder1: FloatingActionButton
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var fabAddOrder: FloatingActionButton
+    private lateinit var bottomNav: BottomNavigationView
 
-    private var coffeeItems: List<Item> = emptyList()
-    private var chocolateItems: List<Item> = emptyList()
-    private var otherItems: List<Item> = emptyList()
+    private val adapter = ItemAdapter { item ->
+        Toast.makeText(this, "Đã chọn: ${item.name}", Toast.LENGTH_SHORT).show()
+    }
+
+    // Chỉ tải dữ liệu 1 lần duy nhất
+    private var allItems: List<Item> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_drink_menu)
 
-        bottomNavigationView = findViewById(R.id.bottom_navigation_drink_menu)
+        initViews()
+        setupRecyclerView()
+        setupButtons()
+        setupBottomNav()
+
+        // Chỉ gọi API 1 lần khi mở
+        loadAllItemsOnce()
+    }
+
+    private fun initViews() {
         btnCoffee = findViewById(R.id.btnCoffee)
-        btnChocolate = findViewById(R.id.btnChocolate)
+        btnTea = findViewById(R.id.btnTea)
+        btnCake = findViewById(R.id.btnCake)
         btnOthers = findViewById(R.id.btnOthers)
-        fabAddOrder1 = findViewById(R.id.fabAddOrder1)
-
-        setupBottomNavigationView()
-        setupFilterButtons()
-        fetchAllItems()
-
-        fabAddOrder1.setOnClickListener {
-            Toast.makeText(this, "FAB clicked", Toast.LENGTH_SHORT).show()
-        }
+        recyclerView = findViewById(R.id.recyclerViewMenu)
+        fabAddOrder = findViewById(R.id.fabAddOrder1)
+        bottomNav = findViewById(R.id.bottom_navigation_drink_menu)
     }
 
-    private fun fetchAllItems() {
-        val apiClient = ApiClient.instance
-
-        apiClient.getCoffeeItems().enqueue(object : Callback<List<Item>> {
-            override fun onResponse(call: Call<List<Item>>, response: Response<List<Item>>) {
-                if (response.isSuccessful) {
-                    coffeeItems = response.body() ?: emptyList()
-                    Log.d("DrinkMenuActivity", "Coffee items fetched: ${coffeeItems.size}")
-                    // Initially select coffee
-                    selectFilterButton(btnCoffee)
-                } else {
-                    Toast.makeText(this@DrinkMenuActivity, "Failed to fetch coffee items", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<List<Item>>, t: Throwable) {
-                Log.e("DrinkMenuActivity", "API call failed", t)
-                Toast.makeText(this@DrinkMenuActivity, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-
-        apiClient.getChocolateItems().enqueue(object : Callback<List<Item>> {
-            override fun onResponse(call: Call<List<Item>>, response: Response<List<Item>>) {
-                if (response.isSuccessful) {
-                    chocolateItems = response.body() ?: emptyList()
-                    Log.d("DrinkMenuActivity", "Chocolate items fetched: ${chocolateItems.size}")
-                } else {
-                    Toast.makeText(this@DrinkMenuActivity, "Failed to fetch chocolate items", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<List<Item>>, t: Throwable) {
-                Log.e("DrinkMenuActivity", "API call failed", t)
-                Toast.makeText(this@DrinkMenuActivity, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-
-        apiClient.getOtherItems().enqueue(object : Callback<List<Item>> {
-            override fun onResponse(call: Call<List<Item>>, response: Response<List<Item>>) {
-                if (response.isSuccessful) {
-                    otherItems = response.body() ?: emptyList()
-                    Log.d("DrinkMenuActivity", "Other items fetched: ${otherItems.size}")
-                } else {
-                    Toast.makeText(this@DrinkMenuActivity, "Failed to fetch other items", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<List<Item>>, t: Throwable) {
-                Log.e("DrinkMenuActivity", "API call failed", t)
-                Toast.makeText(this@DrinkMenuActivity, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+    private fun setupRecyclerView() {
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        recyclerView.adapter = adapter
     }
 
-    private fun setupBottomNavigationView() {
-        bottomNavigationView.selectedItemId = R.id.navigation_drink_menu // Highlight "Drink Menu"
-        bottomNavigationView.setOnItemSelectedListener {
+    private fun setupButtons() {
+        btnCoffee.setOnClickListener { filterAndShow("Coffee", "Specialty Coffee", "Modern Coffee") }
+        btnTea.setOnClickListener { filterAndShow("Tea", "Milk Tea") }
+        btnCake.setOnClickListener { filterAndShow("Cake") }
+        btnOthers.setOnClickListener { filterAndShow("all") }
+    }
+
+    private fun setupBottomNav() {
+        bottomNav.selectedItemId = R.id.navigation_drink_menu
+        bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.navigation_home -> {
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
-                    true
+                R.id.navigation_home -> startActivity(Intent(this, MainActivity::class.java))
+                R.id.navigation_your_order -> startActivity(Intent(this, YourOrderActivity::class.java))
+                R.id.navigation_favorites -> startActivity(Intent(this, FavoritesActivity::class.java))
+            }
+            finish()
+            true
+        }
+    }
+
+    // CHỈ GỌI API 1 LẦN DUY NHẤT
+    private fun loadAllItemsOnce() {
+        ItemDAO.getAllItems { success, message, jsonArray ->
+            if (success && jsonArray != null) {
+                allItems = parseJsonToItems(jsonArray)
+                runOnUiThread {
+                    adapter.submitList(allItems)
+                    Toast.makeText(this, "Đã tải ${allItems.size} món", Toast.LENGTH_LONG).show()
+                    // Mặc định hiện Cà phê
+                    filterAndShow("Coffee", "Specialty Coffee", "Modern Coffee")
                 }
-                R.id.navigation_drink_menu -> {
-                    // Already on Drink Menu, do nothing or re-initialize
-                    true
+            } else {
+                runOnUiThread {
+                    Toast.makeText(this, "Lỗi tải dữ liệu: $message", Toast.LENGTH_LONG).show()
                 }
-                R.id.navigation_your_order -> {
-                    startActivity(Intent(this, YourOrderActivity::class.java))
-                    finish()
-                    true
-                }
-                R.id.navigation_favorites -> {
-                    startActivity(Intent(this, FavoritesActivity::class.java))
-                    finish()
-                    true
-                }
-                else -> false
             }
         }
     }
 
-    private fun setupFilterButtons() {
-        btnCoffee.setOnClickListener { selectFilterButton(btnCoffee) }
-        btnChocolate.setOnClickListener { selectFilterButton(btnChocolate) }
-        btnOthers.setOnClickListener { selectFilterButton(btnOthers) }
-    }
-
-    private fun selectFilterButton(selectedButton: Button) {
-        // Reset all buttons to default state
-        btnCoffee.setBackgroundResource(R.color.backgroundLight)
-        btnCoffee.setTextColor(resources.getColor(R.color.dark_brown))
-        btnChocolate.setBackgroundResource(R.color.backgroundLight)
-        btnChocolate.setTextColor(resources.getColor(R.color.dark_brown))
-        btnOthers.setBackgroundResource(R.color.backgroundLight)
-        btnOthers.setTextColor(resources.getColor(R.color.dark_brown))
-
-        // Set selected button's state
-        selectedButton.setBackgroundResource(R.color.brown)
-        selectedButton.setTextColor(resources.getColor(R.color.white))
-
-        // Filter drink items based on selected category
-        when (selectedButton) {
-            btnCoffee -> {
-                Log.d("DrinkMenuActivity", "Displaying coffee items.")
-                Toast.makeText(this, "Displaying ${coffeeItems.size} coffee items.", Toast.LENGTH_SHORT).show()
-                // TODO: Update a RecyclerView with coffeeItems
-            }
-            btnChocolate -> {
-                Log.d("DrinkMenuActivity", "Displaying chocolate items.")
-                Toast.makeText(this, "Displaying ${chocolateItems.size} chocolate items.", Toast.LENGTH_SHORT).show()
-                // TODO: Update a RecyclerView with chocolateItems
-            }
-            btnOthers -> {
-                Log.d("DrinkMenuActivity", "Displaying other items.")
-                Toast.makeText(this, "Displaying ${otherItems.size} other items.", Toast.LENGTH_SHORT).show()
-                // TODO: Update a RecyclerView with otherItems
+    // LỌC Ở CLIENT - SIÊU NHANH
+    private fun filterAndShow(vararg categories: String) {
+        val filtered = if (categories.contains("all")) {
+            allItems
+        } else {
+            allItems.filter { item ->
+                categories.any { cat -> item.category.contains(cat, ignoreCase = true) }
             }
         }
+
+        adapter.submitList(filtered)
+
+        // Highlight nút được chọn
+        listOf(btnCoffee, btnTea, btnCake, btnOthers).forEach {
+            it.setBackgroundResource(R.color.backgroundLight)
+            it.setTextColor(resources.getColor(R.color.dark_brown, theme))
+        }
+        when {
+            categories.any { it.contains("Coffee", ignoreCase = true) } -> {
+                btnCoffee.setBackgroundResource(R.color.brown)
+                btnCoffee.setTextColor(resources.getColor(R.color.white, theme))
+            }
+            categories.any { it.contains("Tea", ignoreCase = true) } -> {
+                btnTea.setBackgroundResource(R.color.brown)
+                btnTea.setTextColor(resources.getColor(R.color.white, theme))
+            }
+            categories.any { it.contains("Cake", ignoreCase = true) } -> {
+                btnCake.setBackgroundResource(R.color.brown)
+                btnCake.setTextColor(resources.getColor(R.color.white, theme))
+            }
+            else -> {
+                btnOthers.setBackgroundResource(R.color.brown)
+                btnOthers.setTextColor(resources.getColor(R.color.white, theme))
+            }
+        }
+    }
+
+    private fun parseJsonToItems(jsonArray: JSONArray): List<Item> {
+        val list = mutableListOf<Item>()
+        for (i in 0 until jsonArray.length()) {
+            val obj = jsonArray.getJSONObject(i)
+            list.add(
+                Item(
+                    id = obj.optString("_id"),
+                    name = obj.optString("name"),
+                    description = obj.optString("description"),
+                    price = obj.optDouble("basePrice", 0.0),
+                    imageUrl = obj.optString("image_url"),
+                    category = obj.optString("category")
+                )
+            )
+        }
+        return list
+    }
+}
+
+// ============================= ITEM ADAPTER - KHÔNG DÙNG GLIDE =============================
+class ItemAdapter(private val onClick: (Item) -> Unit) :
+    ListAdapter<Item, ItemAdapter.ViewHolder>(DiffCallback()) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_drink_card, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val tvName: TextView = itemView.findViewById(R.id.tvDrinkName)
+        private val tvPrice: TextView = itemView.findViewById(R.id.tvDrinkPrice)
+        private val ivImage: ImageView = itemView.findViewById(R.id.ivDrinkImage)
+
+        fun bind(item: Item) {
+            tvName.text = item.name
+            tvPrice.text = "${item.price.toInt()}đ"
+
+            // LOAD ẢNH BẰNG THREAD - KHÔNG CẦN GLIDE, PICASSO, COIL
+            Thread {
+                try {
+                    val bitmap = BitmapFactory.decodeStream(URL(item.imageUrl).openStream())
+                    runOnUiThread {
+                        ivImage.setImageBitmap(bitmap)
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        ivImage.setImageResource(R.drawable.ic_error) // bạn tạo icon lỗi này nhé
+                    }
+                }
+            }.start()
+
+            itemView.setOnClickListener { onClick(item) }
+        }
+    }
+
+    class DiffCallback : DiffUtil.ItemCallback<Item>() {
+        override fun areItemsTheSame(oldItem: Item, newItem: Item) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: Item, newItem: Item) = oldItem == newItem
     }
 }

@@ -44,6 +44,10 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+// Nếu bạn dùng Material Button và FAB thì thêm luôn (nếu chưa có)
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.squareup.picasso:picasso:2.71828")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

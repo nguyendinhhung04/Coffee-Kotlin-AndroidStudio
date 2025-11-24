@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Màu khi tab ĐƯỢC CHỌN (màu cam đỏ chủ đạo của quán cà phê) -->
+    <item android:color="#D84315" android:state_checked="true" />
+
+    <!-- Màu khi tab KHÔNG được chọn (xám chuẩn Material) -->
+    <item android:color="#757575" />
+
+</selector>
