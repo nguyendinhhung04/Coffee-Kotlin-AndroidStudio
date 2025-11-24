@@ -1,6 +1,7 @@
 package com.example.coffeeshop.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,14 +9,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.coffeeshop.R
 import com.example.coffeeshop.data.dao.ItemDAO
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
-import org.json.JSONArray
-import org.json.JSONObject
-import java.io.IOException
+import com.example.coffeeshop.data.model.Item // <-- THÊM IMPORT NÀY
 
 class ItemFragment : Fragment() {
+
+    private val TAG = "ItemFragment" // Tag để log lỗi cho dễ debug
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,49 +21,45 @@ class ItemFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_item, container, false)
 
-        // 🟢 Example: Add new item
-        val newItem = JSONObject().apply {
-            put("name", "Latte")
-            put("category", "Coffee")
-            put("image", "https://example.com/latte.jpg")
-            put("price", 49000)
-            put("description", "Smooth and creamy latte ☕")
-        }
-
-        ItemDAO.createItem(newItem, object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                requireActivity().runOnUiThread {
-                    if (response.isSuccessful)
-                        Toast.makeText(requireContext(), "✅ Item added!", Toast.LENGTH_SHORT).show()
-                    else
-                        Toast.makeText(requireContext(), "❌ Failed: ${response.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
-
-        // 🔵 Example: Fetch all items
-        ItemDAO.getAllItems(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Fetch failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val json = response.body?.string()
-                val arr = JSONArray(json)
-                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Loaded ${arr.length()} items", Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
+        // Gọi hàm để lấy dữ liệu khi view được tạo
+        fetchAllItems()
 
         return view
+    }
+
+    /**
+     * Hàm lấy tất cả item từ DAO và xử lý kết quả.
+     */
+    private fun fetchAllItems() {
+        // Sử dụng callback đã được tùy chỉnh từ ItemDAO
+        ItemDAO.getAllItems { success, items, message ->
+            // Luôn đảm bảo rằng việc cập nhật UI được thực hiện trên Main Thread
+            // requireActivity().runOnUiThread là cách an toàn để làm điều này trong Fragment
+            requireActivity().runOnUiThread {
+                if (success && items != null) {
+                    // Thành công: items là một List<Item> đã sẵn sàng để sử dụng
+                    Toast.makeText(
+                        requireContext(),
+                        "Successfully loaded ${items} items.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    // TODO: Cập nhật dữ liệu vào RecyclerView Adapter của bạn ở đây
+                    // ví dụ: itemAdapter.submitList(items)
+
+                    // Log để kiểm tra dữ liệu
+                    items.forEach { Log.d(TAG, "Item: ${it}") }
+
+                } else {
+                    // Thất bại: Hiển thị thông báo lỗi
+                    Toast.makeText(
+                        requireContext(),
+                        "Error fetching items: $message",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    Log.e(TAG, "Failed to fetch items: $message")
+                }
+            }
+        }
     }
 }

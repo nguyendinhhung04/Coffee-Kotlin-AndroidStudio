@@ -15,7 +15,6 @@
         android:height="80dp"
         android:gravity="center">
         <vector
-            android:name="coffee_cup"
             android:width="80dp"
             android:height="80dp"
             android:viewportWidth="24"
@@ -48,20 +47,6 @@
                 android:strokeWidth="1.5"
                 android:pathData="M15,5c0,-1.5 1,-2 1,-2s1,0.5 1,2" />
         </vector>
-    </item>
-
-    <!-- Chữ nhỏ "Coffee" ở dưới (tùy chọn) -->
-    <item
-        android:gravity="bottom|center_horizontal"
-        android:bottom="16dp">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Coffee"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#8D6E63"
-            android:fontFamily="sans-serif-medium" />
     </item>
 
 </layer-list>

@@ -1,13 +1,8 @@
 package com.example.coffeeshop.ui.activity
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DiffUtil
@@ -36,7 +31,6 @@ class DrinkMenuActivity : AppCompatActivity() {
         Toast.makeText(this, "Đã chọn: ${item.name}", Toast.LENGTH_SHORT).show()
     }
 
-    // Chỉ tải dữ liệu 1 lần duy nhất
     private var allItems: List<Item> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,8 +41,6 @@ class DrinkMenuActivity : AppCompatActivity() {
         setupRecyclerView()
         setupButtons()
         setupBottomNav()
-
-        // Chỉ gọi API 1 lần khi mở
         loadAllItemsOnce()
     }
 
@@ -87,26 +79,23 @@ class DrinkMenuActivity : AppCompatActivity() {
         }
     }
 
-    // CHỈ GỌI API 1 LẦN DUY NHẤT
     private fun loadAllItemsOnce() {
-        ItemDAO.getAllItems { success, message, jsonArray ->
-            if (success && jsonArray != null) {
-                allItems = parseJsonToItems(jsonArray)
+        ItemDAO.getAllItems { success, _, items ->
+            if (success && items != null) {
+                allItems = items
                 runOnUiThread {
                     adapter.submitList(allItems)
-                    Toast.makeText(this, "Đã tải ${allItems.size} món", Toast.LENGTH_LONG).show()
                     // Mặc định hiện Cà phê
                     filterAndShow("Coffee", "Specialty Coffee", "Modern Coffee")
                 }
             } else {
                 runOnUiThread {
-                    Toast.makeText(this, "Lỗi tải dữ liệu: $message", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Lỗi tải dữ liệu", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
-    // LỌC Ở CLIENT - SIÊU NHANH
     private fun filterAndShow(vararg categories: String) {
         val filtered = if (categories.contains("all")) {
             allItems
@@ -118,7 +107,7 @@ class DrinkMenuActivity : AppCompatActivity() {
 
         adapter.submitList(filtered)
 
-        // Highlight nút được chọn
+        // Highlight nút
         listOf(btnCoffee, btnTea, btnCake, btnOthers).forEach {
             it.setBackgroundResource(R.color.backgroundLight)
             it.setTextColor(resources.getColor(R.color.dark_brown, theme))
@@ -142,32 +131,14 @@ class DrinkMenuActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun parseJsonToItems(jsonArray: JSONArray): List<Item> {
-        val list = mutableListOf<Item>()
-        for (i in 0 until jsonArray.length()) {
-            val obj = jsonArray.getJSONObject(i)
-            list.add(
-                Item(
-                    id = obj.optString("_id"),
-                    name = obj.optString("name"),
-                    description = obj.optString("description"),
-                    price = obj.optDouble("basePrice", 0.0),
-                    imageUrl = obj.optString("image_url"),
-                    category = obj.optString("category")
-                )
-            )
-        }
-        return list
-    }
 }
 
-// ============================= ITEM ADAPTER - KHÔNG DÙNG GLIDE =============================
+// ============================= ITEM ADAPTER =============================
 class ItemAdapter(private val onClick: (Item) -> Unit) :
     ListAdapter<Item, ItemAdapter.ViewHolder>(DiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
+    override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): ViewHolder {
+        val view = android.view.LayoutInflater.from(parent.context)
             .inflate(R.layout.item_drink_card, parent, false)
         return ViewHolder(view)
     }
@@ -176,26 +147,22 @@ class ItemAdapter(private val onClick: (Item) -> Unit) :
         holder.bind(getItem(position))
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(itemView: android.view.View) : RecyclerView.ViewHolder(itemView) {
         private val tvName: TextView = itemView.findViewById(R.id.tvDrinkName)
         private val tvPrice: TextView = itemView.findViewById(R.id.tvDrinkPrice)
         private val ivImage: ImageView = itemView.findViewById(R.id.ivDrinkImage)
 
         fun bind(item: Item) {
             tvName.text = item.name
-            tvPrice.text = "${item.price.toInt()}đ"
+            tvPrice.text = "${item.basePrice.toInt()}đ"
 
-            // LOAD ẢNH BẰNG THREAD - KHÔNG CẦN GLIDE, PICASSO, COIL
+            // Load ảnh bằng Thread
             Thread {
                 try {
-                    val bitmap = BitmapFactory.decodeStream(URL(item.imageUrl).openStream())
-                    runOnUiThread {
-                        ivImage.setImageBitmap(bitmap)
-                    }
+                    val bitmap = BitmapFactory.decodeStream(URL(item.image_url).openStream())
+                    itemView.post { ivImage.setImageBitmap(bitmap) }
                 } catch (e: Exception) {
-                    runOnUiThread {
-                        ivImage.setImageResource(R.drawable.ic_error) // bạn tạo icon lỗi này nhé
-                    }
+                    itemView.post { ivImage.setImageResource(R.drawable.ic_error) }
                 }
             }.start()
 
@@ -204,7 +171,7 @@ class ItemAdapter(private val onClick: (Item) -> Unit) :
     }
 
     class DiffCallback : DiffUtil.ItemCallback<Item>() {
-        override fun areItemsTheSame(oldItem: Item, newItem: Item) = oldItem.id == newItem.id
+        override fun areItemsTheSame(oldItem: Item, newItem: Item) = oldItem._id == newItem._id
         override fun areContentsTheSame(oldItem: Item, newItem: Item) = oldItem == newItem
     }
 }
