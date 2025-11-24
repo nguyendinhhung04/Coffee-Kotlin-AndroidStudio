@@ -1,13 +1,20 @@
+
 package com.example.coffeeshop.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coffeeshop.R
+import com.example.coffeeshop.data.api.ApiClient
+import com.example.coffeeshop.data.model.Item
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class DrinkMenuActivity : AppCompatActivity() {
 
@@ -16,6 +23,10 @@ class DrinkMenuActivity : AppCompatActivity() {
     private lateinit var btnChocolate: Button
     private lateinit var btnOthers: Button
     private lateinit var fabAddOrder1: FloatingActionButton
+
+    private var coffeeItems: List<Item> = emptyList()
+    private var chocolateItems: List<Item> = emptyList()
+    private var otherItems: List<Item> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,13 +40,65 @@ class DrinkMenuActivity : AppCompatActivity() {
 
         setupBottomNavigationView()
         setupFilterButtons()
-
-        // Simulate clicking the Coffee button initially
-        btnCoffee.performClick()
+        fetchAllItems()
 
         fabAddOrder1.setOnClickListener {
-            Toast.makeText(this, "Coffee selected", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "FAB clicked", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun fetchAllItems() {
+        val apiClient = ApiClient.instance
+
+        apiClient.getCoffeeItems().enqueue(object : Callback<List<Item>> {
+            override fun onResponse(call: Call<List<Item>>, response: Response<List<Item>>) {
+                if (response.isSuccessful) {
+                    coffeeItems = response.body() ?: emptyList()
+                    Log.d("DrinkMenuActivity", "Coffee items fetched: ${coffeeItems.size}")
+                    // Initially select coffee
+                    selectFilterButton(btnCoffee)
+                } else {
+                    Toast.makeText(this@DrinkMenuActivity, "Failed to fetch coffee items", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Item>>, t: Throwable) {
+                Log.e("DrinkMenuActivity", "API call failed", t)
+                Toast.makeText(this@DrinkMenuActivity, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        apiClient.getChocolateItems().enqueue(object : Callback<List<Item>> {
+            override fun onResponse(call: Call<List<Item>>, response: Response<List<Item>>) {
+                if (response.isSuccessful) {
+                    chocolateItems = response.body() ?: emptyList()
+                    Log.d("DrinkMenuActivity", "Chocolate items fetched: ${chocolateItems.size}")
+                } else {
+                    Toast.makeText(this@DrinkMenuActivity, "Failed to fetch chocolate items", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Item>>, t: Throwable) {
+                Log.e("DrinkMenuActivity", "API call failed", t)
+                Toast.makeText(this@DrinkMenuActivity, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        apiClient.getOtherItems().enqueue(object : Callback<List<Item>> {
+            override fun onResponse(call: Call<List<Item>>, response: Response<List<Item>>) {
+                if (response.isSuccessful) {
+                    otherItems = response.body() ?: emptyList()
+                    Log.d("DrinkMenuActivity", "Other items fetched: ${otherItems.size}")
+                } else {
+                    Toast.makeText(this@DrinkMenuActivity, "Failed to fetch other items", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Item>>, t: Throwable) {
+                Log.e("DrinkMenuActivity", "API call failed", t)
+                Toast.makeText(this@DrinkMenuActivity, "API call failed: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun setupBottomNavigationView() {
@@ -85,7 +148,23 @@ class DrinkMenuActivity : AppCompatActivity() {
         selectedButton.setBackgroundResource(R.color.brown)
         selectedButton.setTextColor(resources.getColor(R.color.white))
 
-        // TODO: Filter drink items based on selected category
-        Toast.makeText(this, "${selectedButton.text} selected", Toast.LENGTH_SHORT).show()
+        // Filter drink items based on selected category
+        when (selectedButton) {
+            btnCoffee -> {
+                Log.d("DrinkMenuActivity", "Displaying coffee items.")
+                Toast.makeText(this, "Displaying ${coffeeItems.size} coffee items.", Toast.LENGTH_SHORT).show()
+                // TODO: Update a RecyclerView with coffeeItems
+            }
+            btnChocolate -> {
+                Log.d("DrinkMenuActivity", "Displaying chocolate items.")
+                Toast.makeText(this, "Displaying ${chocolateItems.size} chocolate items.", Toast.LENGTH_SHORT).show()
+                // TODO: Update a RecyclerView with chocolateItems
+            }
+            btnOthers -> {
+                Log.d("DrinkMenuActivity", "Displaying other items.")
+                Toast.makeText(this, "Displaying ${otherItems.size} other items.", Toast.LENGTH_SHORT).show()
+                // TODO: Update a RecyclerView with otherItems
+            }
+        }
     }
 }
