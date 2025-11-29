@@ -27,6 +27,13 @@ class LoginFragment : Fragment() {
         val btnLogin = view.findViewById<MaterialButton>(R.id.btnLogin)
         val tvForgot = view.findViewById<TextView>(R.id.tvForgot)
 
+        // 🧠 Hardcoded users list (Backdoor for testing)
+        val hardcodedUsers = mapOf(
+            "vietdung" to "123456",
+            "hung36" to "password",
+            "admin" to "admin123"
+        )
+
         btnLogin.setOnClickListener {
             val username = etUsername.text.toString().trim()
             val password = etPassword.text.toString().trim()
@@ -36,14 +43,28 @@ class LoginFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            UserDAO.checkLogin(username, password) { success, message, user ->
-                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-                    if (success && user != null) {
-                        val intent = Intent(requireContext(), MainActivity::class.java)
-                        intent.putExtra("username", user.optString("username"))
-                        startActivity(intent)
-                        requireActivity().finish()
+            // 🧩 1. Check hardcoded user first
+            if (hardcodedUsers.containsKey(username) && hardcodedUsers[username] == password) {
+                Toast.makeText(requireContext(), "Login successful (Hardcoded)!", Toast.LENGTH_SHORT).show()
+                navigateToMain(username)
+            } else {
+                // 🧩 2. Fallback to API check via DAO
+                // Note: Callback has 4 params: success, message, user, token
+                UserDAO.checkLogin(username, password) { success, message, user, token ->
+                    if (isAdded) { // Check if fragment is still attached
+                        requireActivity().runOnUiThread {
+                            if (success) {
+                                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+
+                                // Có thể lưu token vào SharedPreferences ở đây nếu cần
+                                // val savedToken = token
+
+                                val remoteUsername = user?.optString("username") ?: username
+                                navigateToMain(remoteUsername)
+                            } else {
+                                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 }
             }
@@ -54,5 +75,12 @@ class LoginFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun navigateToMain(username: String) {
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+        requireActivity().finish()
     }
 }
