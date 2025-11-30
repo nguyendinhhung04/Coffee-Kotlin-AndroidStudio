@@ -5,46 +5,61 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coffeeshop.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import android.widget.Toast
 import android.content.Intent
+import com.example.coffeeshop.utils.UserSessionManager
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var sessionManager: UserSessionManager
+    private lateinit var tvGreeting: TextView
+    private lateinit var bottomNavigationView: BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        val tvGreeting = findViewById<TextView>(R.id.tvGreeting)
-        val username = intent.getStringExtra("username")
+        // Initialize session manager
+        sessionManager = UserSessionManager(this)
 
-        if (username != null) {
-            tvGreeting.text = "Good day, $username"
-        } else {
-            tvGreeting.text = "Good day, John Smith"
+        // Kiểm tra login status
+        if (!sessionManager.isLoggedIn()) {
+            navigateToLogin()
+            return
         }
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        setContentView(R.layout.activity_main)
+
+        tvGreeting = findViewById(R.id.tvGreeting)
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
+
+        // Load user info from session
+        loadUserInfo()
+
+        setupBottomNavigation()
+    }
+
+    private fun loadUserInfo() {
+        // Lấy tên user từ session
+        val displayName = sessionManager.getDisplayName()
+        tvGreeting.text = "Good day, $displayName"
+    }
+
+    private fun setupBottomNavigation() {
         bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
-                    // Already on Home, do nothing or re-initialize
+                    // Already on Home
                     true
                 }
                 R.id.navigation_drink_menu -> {
-                    val intent = Intent(this, DrinkMenuActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    startActivity(Intent(this, DrinkMenuActivity::class.java))
                     true
                 }
                 R.id.navigation_your_order -> {
-                    val intent = Intent(this, YourOrderActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    startActivity(Intent(this, YourOrderActivity::class.java))
                     true
                 }
                 R.id.navigation_favorites -> {
-                    val intent = Intent(this, FavoritesActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    startActivity(Intent(this, FavoritesActivity::class.java))
                     true
                 }
                 else -> false
@@ -52,6 +67,18 @@ class MainActivity : AppCompatActivity() {
         }
         // Đặt mục Home được chọn mặc định
         bottomNavigationView.selectedItemId = R.id.navigation_home
+    }
 
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    // Nếu bạn có menu logout hoặc nút logout
+    fun logout() {
+        sessionManager.clearSession()
+        navigateToLogin()
     }
 }
