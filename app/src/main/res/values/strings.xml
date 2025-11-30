@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">CoffeeShop</string>
+<<<<<<< Updated upstream
+=======
+    <string name="terms_and_conditions">Terms &amp; Conditions</string>
+    <string name="lucky_wheel_title">Vòng quay may mắn</string>
+    <string name="lucky_wheel_subtitle">Chúc bạn may mắn!</string>
+    <string name="spin_now">Quay ngay</string>
+    <string name="congratulations">Chúc mừng!</string>
+    <string name="lucky_wheel_prize_text">Bạn đã nhận được phần thưởng</string>
+    <string name="use_now">Sử dụng ngay</string>
+>>>>>>> Stashed changes
 </resources>

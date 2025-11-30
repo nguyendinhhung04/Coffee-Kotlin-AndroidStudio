@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_check_in"
+        android:title="📷 Check-in &amp; Nhận quà" />
+    <item
+        android:id="@+id/menu_settings"
+        android:title="Cài đặt" />
+    <item
+        android:id="@+id/menu_about"
+        android:title="Giới thiệu" />
+</menu>
+
