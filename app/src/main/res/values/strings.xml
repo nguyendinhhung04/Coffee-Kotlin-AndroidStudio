@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">CoffeeShop</string>
+    <string name="cart">Cart</string>
+    <string name="no_customization">Không có tùy chọn</string>
 </resources>

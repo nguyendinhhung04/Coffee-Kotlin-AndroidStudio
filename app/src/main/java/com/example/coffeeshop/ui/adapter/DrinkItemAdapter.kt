@@ -11,7 +11,7 @@ import com.example.coffeeshop.R
 import com.example.coffeeshop.data.model.Item
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
 
 class DrinkItemAdapter(
     private var items: List<Item>,
@@ -38,20 +38,17 @@ class DrinkItemAdapter(
         holder.tvTitle.text = item.name
         holder.tvDescription.text = item.description
 
-        // Format price in VND
         val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
         holder.tvPrice.text = formatter.format(item.basePrice)
 
-        // Load image using Glide
         Glide.with(holder.itemView.context)
             .load(item.image_url)
             .placeholder(R.drawable.socola)
             .error(R.drawable.socola)
             .into(holder.ivImage)
 
-        holder.fabAdd.setOnClickListener {
-            onAddClick(item)
-        }
+        holder.fabAdd.setOnClickListener { onAddClick(item) }
+        holder.itemView.setOnClickListener { onAddClick(item) }
     }
 
     override fun getItemCount(): Int = items.size

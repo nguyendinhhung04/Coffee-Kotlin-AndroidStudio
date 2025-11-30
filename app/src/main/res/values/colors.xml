@@ -16,6 +16,10 @@
     <color name="brownMedium">#A47F5B</color>
     <color name="backgroundLight">#F5E0B5</color>
     <color name="dark_brown">#654321</color>
-
+    <color name="gray">#808080</color>
+    <color name="lightGray">#D3D3D3</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#008000</color>
+    <color name="orange">#FFA500</color>
 
 </resources>

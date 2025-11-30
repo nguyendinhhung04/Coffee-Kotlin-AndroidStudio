@@ -162,4 +162,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Cart FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabCart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cart"
+        android:contentDescription="@string/cart"
+        app:tint="@color/white"
+        app:backgroundTint="@color/brown"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="72dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation_drink_menu" />
+
+    <!-- Cart badge -->
+    <TextView
+        android:id="@+id/tvCartBadge"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/bg_cart_badge"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        android:visibility="gone"
+        android:text="0"
+        app:layout_constraintEnd_toEndOf="@id/fabCart"
+        app:layout_constraintBottom_toTopOf="@id/fabCart"
+        android:translationX="4dp"
+        android:translationY="4dp"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

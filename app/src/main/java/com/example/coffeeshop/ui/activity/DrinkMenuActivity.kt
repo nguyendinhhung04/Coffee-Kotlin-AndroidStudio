@@ -13,8 +13,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.coffeeshop.R
 import com.example.coffeeshop.data.dao.ItemDAO
 import com.example.coffeeshop.data.model.Item
-import com.example.coffeeshop.ui.adapter.DrinkItemAdapter
+import com.example.coffeeshop.data.model.CartItem
+import com.example.coffeeshop.ui.adapter.DrinkItemAdapter   // <-- use DrinkItemAdapter
+import com.example.coffeeshop.ui.fragment.CartBottomSheetFragment
+import com.example.coffeeshop.utils.CartManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DrinkMenuActivity : AppCompatActivity() {
 
@@ -25,7 +29,10 @@ class DrinkMenuActivity : AppCompatActivity() {
     private lateinit var rvDrinkItems: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var tvEmptyMessage: TextView
+    private lateinit var tvCartBadge: TextView
+    private lateinit var fabCart: FloatingActionButton
 
+    // Adapter for menu list = Item
     private lateinit var drinkAdapter: DrinkItemAdapter
     private var currentCategory = "coffee"
 
@@ -37,8 +44,8 @@ class DrinkMenuActivity : AppCompatActivity() {
         setupBottomNavigationView()
         setupFilterButtons()
         setupRecyclerView()
+        setupCartButton()
 
-        // Load coffee items initially
         loadItemsByCategory("coffee")
     }
 
@@ -50,9 +57,12 @@ class DrinkMenuActivity : AppCompatActivity() {
         rvDrinkItems = findViewById(R.id.rvDrinkItems)
         progressBar = findViewById(R.id.progressBar)
         tvEmptyMessage = findViewById(R.id.tvEmptyMessage)
+        tvCartBadge = findViewById(R.id.tvCartBadge)
+        fabCart = findViewById(R.id.fabCart)
     }
 
     private fun setupRecyclerView() {
+        // DrinkItemAdapter works with List<Item> and one lambda
         drinkAdapter = DrinkItemAdapter(emptyList()) { item ->
             onItemAddClick(item)
         }
@@ -101,13 +111,10 @@ class DrinkMenuActivity : AppCompatActivity() {
             selectFilterButton(btnOthers)
             loadItemsByCategory("other")
         }
-
-        // Select coffee by default
         selectFilterButton(btnCoffee)
     }
 
     private fun selectFilterButton(selectedButton: Button) {
-        // Reset all buttons
         btnCoffee.setBackgroundResource(R.drawable.bg_button_unselected)
         btnCoffee.setTextColor(resources.getColor(R.color.dark_brown, null))
         btnChocolate.setBackgroundResource(R.drawable.bg_button_unselected)
@@ -115,7 +122,6 @@ class DrinkMenuActivity : AppCompatActivity() {
         btnOthers.setBackgroundResource(R.drawable.bg_button_unselected)
         btnOthers.setTextColor(resources.getColor(R.color.dark_brown, null))
 
-        // Set selected button
         selectedButton.setBackgroundResource(R.drawable.bg_button_selected)
         selectedButton.setTextColor(resources.getColor(R.color.white, null))
     }
@@ -133,7 +139,7 @@ class DrinkMenuActivity : AppCompatActivity() {
                         showEmptyMessage(true)
                     } else {
                         showEmptyMessage(false)
-                        drinkAdapter.updateItems(items)
+                        drinkAdapter.updateItems(items)   // List<Item>
                     }
                 } else {
                     showEmptyMessage(true)
@@ -154,7 +160,40 @@ class DrinkMenuActivity : AppCompatActivity() {
     }
 
     private fun onItemAddClick(item: Item) {
+        val cartItem = CartItem(
+            item = item,
+            quantity = 1,
+            customizations = emptyMap(),
+            price = item.basePrice
+        )
+        CartManager.addItem(cartItem)
+        updateCartBadge()
         Toast.makeText(this, "Added ${item.name} to cart", Toast.LENGTH_SHORT).show()
-        // TODO: Navigate to item detail or add to cart
+    }
+
+    private fun setupCartButton() {
+        fabCart.setOnClickListener {
+            if (CartManager.isEmpty()) {
+                Toast.makeText(this, "Cart is empty", Toast.LENGTH_SHORT).show()
+            } else {
+                val cartFragment = CartBottomSheetFragment.newInstance()
+                cartFragment.show(supportFragmentManager, "cart_bottom_sheet")
+            }
+        }
+    }
+
+    private fun updateCartBadge() {
+        val count = CartManager.getItemCount()
+        if (count > 0) {
+            tvCartBadge.visibility = View.VISIBLE
+            tvCartBadge.text = count.toString()
+        } else {
+            tvCartBadge.visibility = View.GONE
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateCartBadge()
     }
 }
