@@ -1,5 +1,7 @@
 package com.example.coffeeshop.ui.adapter
 
+import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,7 +9,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.coffeeshop.R
 import com.example.coffeeshop.data.model.CartItem
 import java.text.NumberFormat
@@ -44,7 +45,7 @@ class CartItemAdapter(
         holder.tvTitle.text = item.name
         holder.tvQuantity.text = cartItem.quantity.toString()
 
-        // Show customizations (size, temp, etc.)
+        // Show customizations
         holder.tvDescription.text =
             if (cartItem.customizations.isNotEmpty()) {
                 cartItem.customizations.entries.joinToString { "${it.key}: ${it.value}" }
@@ -52,16 +53,25 @@ class CartItemAdapter(
                 holder.itemView.context.getString(R.string.no_customization)
             }
 
-        // Format total price in VND
+        // Format price
         val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
         holder.tvPrice.text = formatter.format(cartItem.getTotalPrice())
 
-        // Image
-        Glide.with(holder.itemView.context)
-            .load(item.image_url)
-            .placeholder(R.drawable.socola)
-            .error(R.drawable.socola)
-            .into(holder.ivImage)
+        // ===== Load image from assets/item_img/ =====
+        val context = holder.itemView.context
+        val imageName = item.image_url
+
+        try {
+            val inputStream = context.assets.open("item_img/$imageName")
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            holder.ivImage.setImageBitmap(bitmap)
+            inputStream.close()
+
+            Log.d("CartAdapter", "Loaded asset image: item_img/$imageName")
+        } catch (e: Exception) {
+            Log.w("CartAdapter", "Image not found in assets: item_img/$imageName → ${e.message}")
+            holder.ivImage.setImageResource(R.drawable.socola)
+        }
 
         // Actions
         holder.btnPlus.setOnClickListener { onPlusClick(cartItem) }
