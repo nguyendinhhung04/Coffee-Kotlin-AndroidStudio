@@ -75,6 +75,19 @@
             android:layout_margin="4dp" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSeasonal"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Gợi ý"
+            android:textColor="@color/dark_brown"
+            android:backgroundTint="@color/backgroundLight"
+            app:strokeColor="@color/brown"
+            app:cornerRadius="12dp"
+            android:layout_margin="4dp" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOthers"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"

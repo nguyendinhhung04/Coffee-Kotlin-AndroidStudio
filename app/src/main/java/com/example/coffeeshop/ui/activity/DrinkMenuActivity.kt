@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.coffeeshop.R
 import com.example.coffeeshop.data.dao.ItemDAO
 import com.example.coffeeshop.data.model.Item
+import com.example.coffeeshop.utils.SeasonHelper
+import com.example.coffeeshop.utils.Season
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONArray
@@ -22,6 +24,7 @@ class DrinkMenuActivity : AppCompatActivity() {
     private lateinit var btnCoffee: Button
     private lateinit var btnTea: Button
     private lateinit var btnCake: Button
+    private lateinit var btnSeasonal: Button
     private lateinit var btnOthers: Button
     private lateinit var recyclerView: RecyclerView
     private lateinit var fabAddOrder: FloatingActionButton
@@ -41,6 +44,7 @@ class DrinkMenuActivity : AppCompatActivity() {
         setupRecyclerView()
         setupButtons()
         setupBottomNav()
+        updateSeasonalButtonText()
         loadAllItemsOnce()
     }
 
@@ -48,6 +52,7 @@ class DrinkMenuActivity : AppCompatActivity() {
         btnCoffee = findViewById(R.id.btnCoffee)
         btnTea = findViewById(R.id.btnTea)
         btnCake = findViewById(R.id.btnCake)
+        btnSeasonal = findViewById(R.id.btnSeasonal)
         btnOthers = findViewById(R.id.btnOthers)
         recyclerView = findViewById(R.id.recyclerViewMenu)
         fabAddOrder = findViewById(R.id.fabAddOrder1)
@@ -63,6 +68,11 @@ class DrinkMenuActivity : AppCompatActivity() {
         btnCoffee.setOnClickListener { filterAndShow("Coffee", "Specialty Coffee", "Modern Coffee") }
         btnTea.setOnClickListener { filterAndShow("Tea", "Milk Tea") }
         btnCake.setOnClickListener { filterAndShow("Cake") }
+        btnSeasonal.setOnClickListener { showSeasonalRecommendations() }
+        btnSeasonal.setOnLongClickListener { 
+            showSeasonTestDialog()
+            true 
+        }
         btnOthers.setOnClickListener { filterAndShow("all") }
     }
 
@@ -109,7 +119,7 @@ class DrinkMenuActivity : AppCompatActivity() {
         adapter.submitList(filtered)
 
         // Highlight nút
-        listOf(btnCoffee, btnTea, btnCake, btnOthers).forEach {
+        listOf(btnCoffee, btnTea, btnCake, btnSeasonal, btnOthers).forEach {
             it.setBackgroundResource(R.color.backgroundLight)
             it.setTextColor(resources.getColor(R.color.dark_brown, theme))
         }
@@ -131,6 +141,64 @@ class DrinkMenuActivity : AppCompatActivity() {
                 btnOthers.setTextColor(resources.getColor(R.color.white, theme))
             }
         }
+    }
+
+    private fun updateSeasonalButtonText() {
+        val currentSeason = SeasonHelper.getCurrentSeason()
+        val seasonName = SeasonHelper.getSeasonName(currentSeason)
+        btnSeasonal.text = "Mùa $seasonName"
+    }
+
+    private fun showSeasonalRecommendations() {
+        val currentSeason = SeasonHelper.getCurrentSeason()
+        val seasonKeywords = SeasonHelper.getSeasonKeywords(currentSeason)
+        val seasonName = SeasonHelper.getSeasonName(currentSeason)
+
+        // Highlight nút Gợi ý
+        listOf(btnCoffee, btnTea, btnCake, btnSeasonal, btnOthers).forEach {
+            it.setBackgroundResource(R.color.backgroundLight)
+            it.setTextColor(resources.getColor(R.color.dark_brown, theme))
+        }
+        btnSeasonal.setBackgroundResource(R.color.brown)
+        btnSeasonal.setTextColor(resources.getColor(R.color.white, theme))
+
+        // Load món gợi ý theo mùa
+        ItemDAO.getRecommendedItemsBySeason(seasonKeywords) { success, message, items ->
+            runOnUiThread {
+                if (success && items != null && items.isNotEmpty()) {
+                    adapter.submitList(items)
+                    Toast.makeText(this, "Gợi ý mùa ${seasonName}: ${items.size} món", Toast.LENGTH_SHORT).show()
+                } else {
+                    // Nếu không tìm thấy, hiển thị tất cả món
+                    adapter.submitList(allItems)
+                    Toast.makeText(this, "Không có món gợi ý cho mùa ${seasonName}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun showSeasonTestDialog() {
+        val seasons = arrayOf("Xuân", "Hè", "Thu", "Đông", "Tắt test (dùng mùa thật)")
+        val seasonValues = arrayOf(Season.SPRING, Season.SUMMER, Season.FALL, Season.WINTER, null)
+        
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Chọn mùa để test")
+            .setItems(seasons) { _, which ->
+                if (which < 4) {
+                    // Set mùa test
+                    SeasonHelper.setTestSeason(seasonValues[which])
+                    Toast.makeText(this, "Đã set mùa test: ${seasons[which]}", Toast.LENGTH_SHORT).show()
+                } else {
+                    // Tắt test, dùng mùa thật
+                    SeasonHelper.setTestSeason(null)
+                    Toast.makeText(this, "Đã tắt test, dùng mùa thật", Toast.LENGTH_SHORT).show()
+                }
+                // Cập nhật lại text nút và hiển thị món gợi ý
+                updateSeasonalButtonText()
+                showSeasonalRecommendations()
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
     }
 }
 

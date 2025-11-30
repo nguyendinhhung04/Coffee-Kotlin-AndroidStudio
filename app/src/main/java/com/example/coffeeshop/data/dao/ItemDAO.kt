@@ -225,4 +225,31 @@ object ItemDAO {
         }
         return list
     }
+
+    // ----------------------------
+    // Lấy món gợi ý theo mùa
+    // ----------------------------
+    fun getRecommendedItemsBySeason(seasonKeywords: List<String>, callback: (Boolean, String, List<Item>?) -> Unit) {
+        // Lấy tất cả món và filter theo từ khóa mùa
+        getAllItems { success, message, allItems ->
+            if (success && allItems != null) {
+                val recommendedItems = allItems.filter { item ->
+                    val itemNameLower = item.name.lowercase()
+                    val itemDescLower = item.description.lowercase()
+                    val itemCategoryLower = item.category.lowercase()
+                    
+                    // Kiểm tra xem món có chứa từ khóa mùa không
+                    seasonKeywords.any { keyword ->
+                        itemNameLower.contains(keyword.lowercase()) ||
+                        itemDescLower.contains(keyword.lowercase()) ||
+                        itemCategoryLower.contains(keyword.lowercase())
+                    }
+                }.take(4) // Lấy tối đa 4 món gợi ý
+                
+                callback(true, "Tìm thấy ${recommendedItems.size} món gợi ý", recommendedItems)
+            } else {
+                callback(false, message, null)
+            }
+        }
+    }
 }
