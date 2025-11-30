@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -27,11 +28,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        // SỬA: Nâng cấp phiên bản Java lên 17 để tương thích tốt hơn
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        // SỬA: JvmTarget cũng cần được nâng cấp
+        jvmTarget = "17"
+    }
+    // THÊM: Bật tính năng View Binding để thay thế findViewById
+    buildFeatures {
+        viewBinding = true
     }
 }
 
@@ -44,15 +51,21 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-// Nếu bạn dùng Material Button và FAB thì thêm luôn (nếu chưa có)
-    implementation("com.squareup.picasso:picasso:2.71828")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("org.json:json:20210307")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+
+    // Glide for image loading
+    // SỬA: Dùng cú pháp Kotlin DSL với dấu ngoặc kép
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    // SỬA: Dùng "kapt" thay vì "annotationProcessor"
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+    // UI Components
+    // SỬA: Dùng cú pháp Kotlin DSL với dấu ngoặc kép
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.cardview:cardview:1.0.0")
 }

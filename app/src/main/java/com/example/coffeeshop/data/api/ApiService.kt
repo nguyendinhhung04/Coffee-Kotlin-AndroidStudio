@@ -1,4 +1,3 @@
-
 package com.example.coffeeshop.data.api
 
 import com.example.coffeeshop.data.model.Item
