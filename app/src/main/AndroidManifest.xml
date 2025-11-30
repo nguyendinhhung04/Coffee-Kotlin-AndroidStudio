@@ -18,14 +18,12 @@
         <activity
             android:name=".ui.activity.LoginActivity"
             android:exported="true">
-            <!-- DI CHUYỂN INTENT-FILTER VÀO ĐÂY -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Xóa intent-filter khỏi MainActivity và đặt exported="false" -->
         <activity
             android:name=".ui.activity.MainActivity"
             android:exported="false" />
@@ -41,6 +39,10 @@
 
         <activity
             android:name=".ui.activity.FavoritesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.PaymentActivity"
             android:exported="false" />
 
 

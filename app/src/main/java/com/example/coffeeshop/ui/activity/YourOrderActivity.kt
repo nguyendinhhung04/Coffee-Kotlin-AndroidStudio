@@ -52,6 +52,11 @@ class YourOrderActivity : AppCompatActivity() {
                     finish()
                     true
                 }
+                R.id.navigation_payment -> {
+                    startActivity(Intent(this, PaymentActivity::class.java))
+                    finish()
+                    true
+                }
                 else -> false
             }
         }

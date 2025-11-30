@@ -73,6 +73,7 @@ class DrinkMenuActivity : AppCompatActivity() {
                 R.id.navigation_home -> startActivity(Intent(this, MainActivity::class.java))
                 R.id.navigation_your_order -> startActivity(Intent(this, YourOrderActivity::class.java))
                 R.id.navigation_favorites -> startActivity(Intent(this, FavoritesActivity::class.java))
+                R.id.navigation_payment -> startActivity(Intent(this, PaymentActivity::class.java))
             }
             finish()
             true

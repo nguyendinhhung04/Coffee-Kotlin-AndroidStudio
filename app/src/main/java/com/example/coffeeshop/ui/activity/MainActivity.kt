@@ -47,6 +47,12 @@ class MainActivity : AppCompatActivity() {
                     finish()
                     true
                 }
+                R.id.navigation_payment -> {
+                    val intent = Intent(this, PaymentActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                    true
+                }
                 else -> false
             }
         }

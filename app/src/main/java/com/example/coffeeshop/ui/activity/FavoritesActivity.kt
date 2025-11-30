@@ -43,6 +43,11 @@ class FavoritesActivity : AppCompatActivity() {
                     // Already on Favorites, do nothing or re-initialize
                     true
                 }
+                R.id.navigation_payment -> {
+                    startActivity(Intent(this, PaymentActivity::class.java))
+                    finish()
+                    true
+                }
                 else -> false
             }
         }
