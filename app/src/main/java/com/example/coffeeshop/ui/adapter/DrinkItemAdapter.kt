@@ -42,12 +42,22 @@ class DrinkItemAdapter(
         val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
         holder.tvPrice.text = formatter.format(item.basePrice)
 
-        // Load image using Glide
-        Glide.with(holder.itemView.context)
-            .load(item.image_url)
-            .placeholder(R.drawable.socola)
-            .error(R.drawable.socola)
-            .into(holder.ivImage)
+        // Load image from assets/item_img folder
+        val context = holder.itemView.context
+        val imageName = item.image_url
+
+        try {
+            // Try to load from assets/item_img/
+            val inputStream = context.assets.open("item_img/$imageName")
+            val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+            holder.ivImage.setImageBitmap(bitmap)
+            inputStream.close()
+            android.util.Log.d("DrinkAdapter", "Image loaded: item_img/$imageName")
+        } catch (e: Exception) {
+            // If not found, use default image
+            android.util.Log.w("DrinkAdapter", "Image not found: item_img/$imageName, error: ${e.message}")
+            holder.ivImage.setImageResource(R.drawable.socola)
+        }
 
         holder.fabAdd.setOnClickListener {
             onAddClick(item)

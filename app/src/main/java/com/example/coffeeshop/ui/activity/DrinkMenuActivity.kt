@@ -68,19 +68,17 @@ class DrinkMenuActivity : AppCompatActivity() {
         bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
+                    // Không dùng finish() để MainActivity load lại
                     startActivity(Intent(this, MainActivity::class.java))
-                    finish()
                     true
                 }
                 R.id.navigation_drink_menu -> true
                 R.id.navigation_your_order -> {
                     startActivity(Intent(this, YourOrderActivity::class.java))
-                    finish()
                     true
                 }
                 R.id.navigation_favorites -> {
                     startActivity(Intent(this, FavoritesActivity::class.java))
-                    finish()
                     true
                 }
                 else -> false
