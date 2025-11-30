@@ -95,7 +95,37 @@
             android:backgroundTint="@color/backgroundLight"
             android:layout_marginEnd="8dp"/>
 
+<<<<<<< Updated upstream
         <Button
+=======
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCake"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Bánh"
+            android:textColor="@color/dark_brown"
+            android:backgroundTint="@color/backgroundLight"
+            app:strokeColor="@color/brown"
+            app:cornerRadius="12dp"
+            android:layout_margin="4dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSeasonal"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Gợi ý"
+            android:textColor="@color/dark_brown"
+            android:backgroundTint="@color/backgroundLight"
+            app:strokeColor="@color/brown"
+            app:cornerRadius="12dp"
+            android:layout_margin="4dp" />
+
+        <com.google.android.material.button.MaterialButton
+>>>>>>> Stashed changes
             android:id="@+id/btnOthers"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
