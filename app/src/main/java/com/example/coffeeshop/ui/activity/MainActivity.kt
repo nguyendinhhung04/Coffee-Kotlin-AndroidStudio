@@ -1,6 +1,9 @@
 package com.example.coffeeshop.ui.activity
 
 import android.os.Bundle
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coffeeshop.R
@@ -21,6 +24,16 @@ class MainActivity : AppCompatActivity() {
         } else {
             tvGreeting.text = "Good day, John Smith"
         }
+
+        // Setup menu 3 gạch ngang
+        val ivMenu = findViewById<ImageView>(R.id.ivMenu)
+        ivMenu.setOnClickListener {
+            showMenuPopup(it)
+        }
+
+        // Ẩn nút Check-in cũ trong Best Seller card
+        val btnCheckIn = findViewById<Button>(R.id.btnCheckIn)
+        btnCheckIn.visibility = android.view.View.GONE
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigationView.setOnItemSelectedListener {
@@ -59,5 +72,31 @@ class MainActivity : AppCompatActivity() {
         // Đặt mục Home được chọn mặc định
         bottomNavigationView.selectedItemId = R.id.navigation_home
 
+    }
+
+    private fun showMenuPopup(view: android.view.View) {
+        val popupMenu = PopupMenu(this, view)
+        popupMenu.menuInflater.inflate(R.menu.menu_main, popupMenu.menu)
+        
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_check_in -> {
+                    val intent = Intent(this, CheckInActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+                R.id.menu_settings -> {
+                    Toast.makeText(this, "Cài đặt", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.menu_about -> {
+                    Toast.makeText(this, "Giới thiệu", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> false
+            }
+        }
+        
+        popupMenu.show()
     }
 }

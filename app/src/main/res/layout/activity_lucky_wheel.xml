@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E53935"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/TextAppearance.Material3.HeadlineSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/lucky_wheel_title"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Vòng quay may mắn" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        style="@style/TextAppearance.Material3.BodyLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/lucky_wheel_subtitle"
+        android:textColor="#FFD700"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+        tools:text="Chúc bạn may mắn!" />
+
+    <!-- Vòng quay -->
+    <FrameLayout
+        android:id="@+id/flWheelContainer"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvSubtitle">
+
+        <com.example.coffeeshop.ui.widget.LuckyWheelView
+            android:id="@+id/wheelView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <!-- Mũi tên chỉ ở trên cùng -->
+        <ImageView
+            android:id="@+id/ivPointer"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="0dp"
+            android:src="@drawable/ic_arrow_up" />
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/btnSpin"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:paddingLeft="48dp"
+        android:paddingTop="16dp"
+        android:paddingRight="48dp"
+        android:paddingBottom="16dp"
+        android:text="@string/spin_now"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cvWheel" />
+
+    <!-- Kết quả -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvResult"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/brown"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSpin"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/tvResultTitle"
+                style="@style/TextAppearance.Material3.TitleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/congratulations"
+                android:textColor="@color/white"
+                tools:text="Chúc mừng!" />
+
+            <TextView
+                android:id="@+id/tvResultPrize"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:text="@string/lucky_wheel_prize_text"
+                android:textColor="@color/white"
+                tools:text="Bạn đã nhận được: 1 cốc nước miễn phí" />
+
+            <Button
+                android:id="@+id/btnUsePrize"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:text="@string/use_now"
+                android:textColor="@color/brown" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

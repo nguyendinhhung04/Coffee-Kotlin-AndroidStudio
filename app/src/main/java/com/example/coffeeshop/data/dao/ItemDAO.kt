@@ -252,4 +252,31 @@ object ItemDAO {
             }
         }
     }
+
+    // ----------------------------
+    // Lấy món gợi ý theo thời tiết
+    // ----------------------------
+    fun getRecommendedItemsByWeather(weatherKeywords: List<String>, callback: (Boolean, String, List<Item>?) -> Unit) {
+        // Lấy tất cả món và filter theo từ khóa thời tiết
+        getAllItems { success, message, allItems ->
+            if (success && allItems != null) {
+                val recommendedItems = allItems.filter { item ->
+                    val itemNameLower = item.name.lowercase()
+                    val itemDescLower = item.description.lowercase()
+                    val itemCategoryLower = item.category.lowercase()
+                    
+                    // Kiểm tra xem món có chứa từ khóa thời tiết không
+                    weatherKeywords.any { keyword ->
+                        itemNameLower.contains(keyword.lowercase()) ||
+                        itemDescLower.contains(keyword.lowercase()) ||
+                        itemCategoryLower.contains(keyword.lowercase())
+                    }
+                }.take(4) // Lấy tối đa 4 món gợi ý
+                
+                callback(true, "Tìm thấy ${recommendedItems.size} món gợi ý", recommendedItems)
+            } else {
+                callback(false, message, null)
+            }
+        }
+    }
 }
