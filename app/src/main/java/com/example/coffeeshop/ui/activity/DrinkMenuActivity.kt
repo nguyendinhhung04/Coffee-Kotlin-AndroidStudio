@@ -2,12 +2,19 @@ package com.example.coffeeshop.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.coffeeshop.R
+import com.example.coffeeshop.data.dao.ItemDAO
+import com.example.coffeeshop.data.model.Item
+import com.example.coffeeshop.ui.adapter.DrinkItemAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DrinkMenuActivity : AppCompatActivity() {
 
@@ -15,31 +22,49 @@ class DrinkMenuActivity : AppCompatActivity() {
     private lateinit var btnCoffee: Button
     private lateinit var btnChocolate: Button
     private lateinit var btnOthers: Button
-    private lateinit var fabAddOrder1: FloatingActionButton
+    private lateinit var rvDrinkItems: RecyclerView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var tvEmptyMessage: TextView
+
+    private lateinit var drinkAdapter: DrinkItemAdapter
+    private var currentCategory = "coffee"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_drink_menu)
 
+        initViews()
+        setupBottomNavigationView()
+        setupFilterButtons()
+        setupRecyclerView()
+
+        // Load coffee items initially
+        loadItemsByCategory("coffee")
+    }
+
+    private fun initViews() {
         bottomNavigationView = findViewById(R.id.bottom_navigation_drink_menu)
         btnCoffee = findViewById(R.id.btnCoffee)
         btnChocolate = findViewById(R.id.btnChocolate)
         btnOthers = findViewById(R.id.btnOthers)
-        fabAddOrder1 = findViewById(R.id.fabAddOrder1)
+        rvDrinkItems = findViewById(R.id.rvDrinkItems)
+        progressBar = findViewById(R.id.progressBar)
+        tvEmptyMessage = findViewById(R.id.tvEmptyMessage)
+    }
 
-        setupBottomNavigationView()
-        setupFilterButtons()
+    private fun setupRecyclerView() {
+        drinkAdapter = DrinkItemAdapter(emptyList()) { item ->
+            onItemAddClick(item)
+        }
 
-        // Simulate clicking the Coffee button initially
-        btnCoffee.performClick()
-
-        fabAddOrder1.setOnClickListener {
-            Toast.makeText(this, "Coffee selected", Toast.LENGTH_SHORT).show()
+        rvDrinkItems.apply {
+            layoutManager = LinearLayoutManager(this@DrinkMenuActivity)
+            adapter = drinkAdapter
         }
     }
 
     private fun setupBottomNavigationView() {
-        bottomNavigationView.selectedItemId = R.id.navigation_drink_menu // Highlight "Drink Menu"
+        bottomNavigationView.selectedItemId = R.id.navigation_drink_menu
         bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
@@ -47,10 +72,7 @@ class DrinkMenuActivity : AppCompatActivity() {
                     finish()
                     true
                 }
-                R.id.navigation_drink_menu -> {
-                    // Already on Drink Menu, do nothing or re-initialize
-                    true
-                }
+                R.id.navigation_drink_menu -> true
                 R.id.navigation_your_order -> {
                     startActivity(Intent(this, YourOrderActivity::class.java))
                     finish()
@@ -67,25 +89,72 @@ class DrinkMenuActivity : AppCompatActivity() {
     }
 
     private fun setupFilterButtons() {
-        btnCoffee.setOnClickListener { selectFilterButton(btnCoffee) }
-        btnChocolate.setOnClickListener { selectFilterButton(btnChocolate) }
-        btnOthers.setOnClickListener { selectFilterButton(btnOthers) }
+        btnCoffee.setOnClickListener {
+            selectFilterButton(btnCoffee)
+            loadItemsByCategory("coffee")
+        }
+        btnChocolate.setOnClickListener {
+            selectFilterButton(btnChocolate)
+            loadItemsByCategory("chocolate")
+        }
+        btnOthers.setOnClickListener {
+            selectFilterButton(btnOthers)
+            loadItemsByCategory("other")
+        }
+
+        // Select coffee by default
+        selectFilterButton(btnCoffee)
     }
 
     private fun selectFilterButton(selectedButton: Button) {
-        // Reset all buttons to default state
-        btnCoffee.setBackgroundResource(R.color.backgroundLight)
-        btnCoffee.setTextColor(resources.getColor(R.color.dark_brown))
-        btnChocolate.setBackgroundResource(R.color.backgroundLight)
-        btnChocolate.setTextColor(resources.getColor(R.color.dark_brown))
-        btnOthers.setBackgroundResource(R.color.backgroundLight)
-        btnOthers.setTextColor(resources.getColor(R.color.dark_brown))
+        // Reset all buttons
+        btnCoffee.setBackgroundResource(R.drawable.bg_button_unselected)
+        btnCoffee.setTextColor(resources.getColor(R.color.dark_brown, null))
+        btnChocolate.setBackgroundResource(R.drawable.bg_button_unselected)
+        btnChocolate.setTextColor(resources.getColor(R.color.dark_brown, null))
+        btnOthers.setBackgroundResource(R.drawable.bg_button_unselected)
+        btnOthers.setTextColor(resources.getColor(R.color.dark_brown, null))
 
-        // Set selected button's state
-        selectedButton.setBackgroundResource(R.color.brown)
-        selectedButton.setTextColor(resources.getColor(R.color.white))
+        // Set selected button
+        selectedButton.setBackgroundResource(R.drawable.bg_button_selected)
+        selectedButton.setTextColor(resources.getColor(R.color.white, null))
+    }
 
-        // TODO: Filter drink items based on selected category
-        Toast.makeText(this, "${selectedButton.text} selected", Toast.LENGTH_SHORT).show()
+    private fun loadItemsByCategory(category: String) {
+        currentCategory = category
+        showLoading(true)
+
+        ItemDAO.getItemsByCategory(category) { success, message, items ->
+            runOnUiThread {
+                showLoading(false)
+
+                if (success && items != null) {
+                    if (items.isEmpty()) {
+                        showEmptyMessage(true)
+                    } else {
+                        showEmptyMessage(false)
+                        drinkAdapter.updateItems(items)
+                    }
+                } else {
+                    showEmptyMessage(true)
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun showLoading(show: Boolean) {
+        progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        rvDrinkItems.visibility = if (show) View.GONE else View.VISIBLE
+    }
+
+    private fun showEmptyMessage(show: Boolean) {
+        tvEmptyMessage.visibility = if (show) View.VISIBLE else View.GONE
+        rvDrinkItems.visibility = if (show) View.GONE else View.VISIBLE
+    }
+
+    private fun onItemAddClick(item: Item) {
+        Toast.makeText(this, "Added ${item.name} to cart", Toast.LENGTH_SHORT).show()
+        // TODO: Navigate to item detail or add to cart
     }
 }
