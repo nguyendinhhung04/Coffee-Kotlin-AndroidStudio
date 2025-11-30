@@ -2,9 +2,12 @@ package com.example.coffeeshop.ui.activity
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -17,7 +20,12 @@ import com.example.coffeeshop.data.dao.ItemDAO
 import com.example.coffeeshop.utils.SeasonHelper
 import com.example.coffeeshop.utils.Season
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
+import com.google.zxing.qrcode.QRCodeWriter
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import java.net.URL
+import java.util.Hashtable
 
 class PaymentActivity : AppCompatActivity() {
     
@@ -30,6 +38,7 @@ class PaymentActivity : AppCompatActivity() {
     private lateinit var layoutRecommendedDrinks: LinearLayout
     private lateinit var tvNoSavedAddress: TextView
     private lateinit var tvEditAddress: TextView
+    private lateinit var btnPayment: Button
     
     private lateinit var sharedPreferences: SharedPreferences
     private val ADDRESS_KEY = "saved_delivery_address"
@@ -55,6 +64,7 @@ class PaymentActivity : AppCompatActivity() {
         layoutRecommendedDrinks = findViewById(R.id.layoutRecommendedDrinks)
         tvNoSavedAddress = findViewById(R.id.tvNoSavedAddress)
         tvEditAddress = findViewById(R.id.tvEditAddress)
+        btnPayment = findViewById(R.id.btnPayment)
         
         // Long-click vào phần "Other drinks we recommend" để test mùa
         layoutRecommendedDrinks.setOnLongClickListener {
@@ -65,6 +75,11 @@ class PaymentActivity : AppCompatActivity() {
         // Click vào "Edit" để nhập địa chỉ
         tvEditAddress.setOnClickListener {
             showAddressInputDialog()
+        }
+        
+        // Click vào nút "Thanh toán" để hiển thị QR code
+        btnPayment.setOnClickListener {
+            showQRPaymentDialog()
         }
     }
 
@@ -127,11 +142,11 @@ class PaymentActivity : AppCompatActivity() {
         when (index) {
             0 -> {
                 tvDrinkName1.text = item.name
-                tvDrinkPrice1.text = "Rp ${item.basePrice.toInt()}"
+                tvDrinkPrice1.text = "${item.basePrice.toInt()} VND"
             }
             1 -> {
                 tvDrinkName2.text = item.name
-                tvDrinkPrice2.text = "Rp ${item.basePrice.toInt()}"
+                tvDrinkPrice2.text = "${item.basePrice.toInt()} VND"
             }
         }
     }
@@ -253,6 +268,158 @@ class PaymentActivity : AppCompatActivity() {
             } catch (e2: Exception) {
                 Toast.makeText(this, "Không thể mở bản đồ", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun showQRPaymentDialog() {
+        // Tính tổng tiền (có thể lấy từ order thực tế)
+        val totalAmount = 32000 // Tạm thời hardcode, có thể lấy từ order thực tế
+        
+        val dialogView = layoutInflater.inflate(R.layout.dialog_qr_payment, null)
+        val ivQRCode = dialogView.findViewById<ImageView>(R.id.ivQRCode)
+        val tvPaymentAmount = dialogView.findViewById<TextView>(R.id.tvPaymentAmount)
+        val btnCloseQR = dialogView.findViewById<Button>(R.id.btnCloseQR)
+
+        tvPaymentAmount.text = "Tổng tiền: ${totalAmount} VND"
+
+        // Tạo QR code với format VietQR
+        // Lưu ý: Để QR code hợp lệ, tài khoản cần được đăng ký với VietQR
+        val qrData = generateVietQRCode(totalAmount)
+        
+        // Debug: Log QR data để kiểm tra
+        android.util.Log.d("PaymentActivity", "QR Data: $qrData")
+        
+        val qrBitmap = generateQRCode(qrData, 500, 500)
+        if (qrBitmap != null) {
+            ivQRCode.setImageBitmap(qrBitmap)
+        } else {
+            Toast.makeText(this, "Không thể tạo QR code", Toast.LENGTH_SHORT).show()
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        btnCloseQR.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun generateVietQRCode(amount: Int): String {
+        // Format VietQR theo chuẩn EMV QR Code của các ngân hàng Việt Nam
+        // Cấu trúc: [ID][Length][Value]
+        
+        // Thông tin ngân hàng
+        val bankCode = "970422" // Mã ngân hàng (970422 = Vietcombank)
+        val accountNumber = "1027833894" // Số tài khoản ngân hàng
+        val merchantName = "COFFEESHOP" // Tên cửa hàng
+        val content = "Thanh toan don hang" // Nội dung chuyển khoản
+        
+        // Payload Format Indicator (00): 01 = QR Code
+        val payloadIndicator = "000201"
+        
+        // Point of Initiation Method (01): 12 = Static QR Code
+        val poiMethod = "010212"
+        
+        // Merchant Account Information (38)
+        // 00 = GUID (A000000727 = VietQR), 01 = Bank code, 02 = Account number
+        val guid = "0010A000000727"
+        val bankCodeField = "01" + String.format("%02d", bankCode.length) + bankCode
+        val accountField = "02" + String.format("%02d", accountNumber.length) + accountNumber
+        val merchantAccountInfoValue = guid + bankCodeField + accountField
+        val merchantAccountInfo = "38" + String.format("%02d", merchantAccountInfoValue.length) + merchantAccountInfoValue
+        
+        // Transaction Currency (53): 704 = VND
+        val currency = "5303704"
+        
+        // Transaction Amount (54): Format với 2 chữ số thập phân
+        val amountStr = String.format("%.2f", amount.toDouble())
+        val transactionAmount = "54" + String.format("%02d", amountStr.length) + amountStr
+        
+        // Country Code (58): VN
+        val countryCode = "5802VN"
+        
+        // Merchant Name (59)
+        val merchantNameField = "59" + String.format("%02d", merchantName.length) + merchantName
+        
+        // Additional Data Field Template (62)
+        // 08 = Purpose of Transaction
+        val purposeField = "08" + String.format("%02d", content.length) + content
+        val additionalData = "62" + String.format("%02d", purposeField.length) + purposeField
+        
+        // Ghép tất cả các trường lại (chưa có CRC)
+        val qrDataWithoutCRC = payloadIndicator + poiMethod + merchantAccountInfo + 
+                               currency + transactionAmount + countryCode + 
+                               merchantNameField + additionalData
+        
+        // Tính CRC-16 (Checksum) - tính trên dữ liệu + "6304"
+        val crc = calculateCRC16(qrDataWithoutCRC + "6304")
+        val crcField = "6304" + String.format("%04X", crc).uppercase()
+        
+        // QR Code hoàn chỉnh
+        return qrDataWithoutCRC + crcField
+    }
+    
+    private fun calculateCRC16(data: String): Int {
+        var crc = 0xFFFF
+        val polynomial = 0x1021
+        
+        val bytes = data.toByteArray(Charsets.ISO_8859_1)
+        for (byte in bytes) {
+            var b = byte.toInt() and 0xFF
+            for (i in 0..7) {
+                val bit = (b ushr (7 - i) and 1) == 1
+                val c15 = (crc ushr 15 and 1) == 1
+                crc = crc shl 1
+                if (c15 xor bit) {
+                    crc = crc xor polynomial
+                }
+            }
+        }
+        
+        crc = crc and 0xFFFF
+        return crc
+    }
+    
+    // Phương án dự phòng: Format đơn giản hơn (URL-based) - để test
+    private fun generateSimplePaymentQR(amount: Int): String {
+        // Format đơn giản dạng URL để các app ngân hàng có thể đọc
+        val bankCode = "970422"
+        val accountNumber = "1027833894"
+        val merchantName = "COFFEESHOP"
+        
+        // Format: banking://transfer?bank=xxx&account=xxx&amount=xxx&content=xxx
+        return "banking://transfer?bank=$bankCode&account=$accountNumber&amount=$amount&content=Thanh%20toan%20don%20hang&merchant=$merchantName"
+    }
+    
+    // Lưu ý: Để QR code hợp lệ với ngân hàng, bạn cần:
+    // 1. Đăng ký tài khoản với VietQR tại https://vietqr.net/
+    // 2. Hoặc liên hệ ngân hàng để đăng ký dịch vụ VietQR
+    // 3. Sau khi đăng ký, bạn sẽ có thông tin chính xác để tạo QR code hợp lệ
+
+    private fun generateQRCode(data: String, width: Int, height: Int): Bitmap? {
+        return try {
+            val hints = Hashtable<EncodeHintType, Any>()
+            hints[EncodeHintType.ERROR_CORRECTION] = ErrorCorrectionLevel.H
+            hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
+            hints[EncodeHintType.MARGIN] = 1
+
+            val writer = QRCodeWriter()
+            val bitMatrix = writer.encode(data, BarcodeFormat.QR_CODE, width, height, hints)
+
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
+                }
+            }
+            bitmap
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }

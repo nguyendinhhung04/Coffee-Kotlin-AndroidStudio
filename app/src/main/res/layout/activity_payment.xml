@@ -151,7 +151,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rp 24.000"
+                android:text="VND 24.000"
                 android:textStyle="bold"
                 android:textColor="@color/brown"
                 android:textSize="16sp"
@@ -236,7 +236,7 @@
                                 android:id="@+id/tvRecommendedDrinkPrice1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Rp 23.000"
+                                android:text="VND 23.000"
                                 android:textColor="@color/brown"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -276,7 +276,7 @@
                                 android:id="@+id/tvRecommendedDrinkPrice2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Rp 18.500"
+                                android:text="VND 18.500"
                                 android:textColor="@color/brown"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -309,7 +309,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 24.000"
+                        android:text="VND 24.000"
                         android:textColor="@color/dark_brown"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -331,7 +331,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 3.000"
+                        android:text="VND 3.000"
                         android:textColor="@color/dark_brown"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -353,7 +353,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 5.000"
+                        android:text="VND 5.000"
                         android:textColor="@color/dark_brown"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -375,7 +375,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 0"
+                        android:text="VND 0"
                         android:textColor="@color/dark_brown"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -398,7 +398,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rp 32.000"
+                        android:text="VND 32.000"
                         android:textStyle="bold"
                         android:textColor="@color/brown"
                         android:textSize="18sp" />
@@ -437,16 +437,16 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Balance: Rp 90.000"
+                        android:text="Balance: VND 90.000"
                         android:textColor="@color/dark_brown"
                         android:textSize="14sp" />
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/btnUsePromo"
+                    android:id="@+id/btnPayment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Use Promo"
+                    android:text="Thanh toán"
                     android:backgroundTint="@color/brownMedium"
                     android:textColor="@android:color/white"
                     android:paddingStart="16dp"
