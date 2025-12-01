@@ -16,7 +16,8 @@ import com.example.coffeeshop.utils.CartManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import java.text.NumberFormat
 import java.util.Locale
-
+import android.content.Intent
+import com.example.coffeeshop.ui.activity.YourOrderActivity
 class CartBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var rvCartItems: RecyclerView
@@ -50,6 +51,11 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
             } else {
                 onCheckoutClick?.invoke()
                 dismiss()
+
+                // Navigate to YourOrderActivity
+                val ctx = requireContext()
+                val intent = Intent(ctx, YourOrderActivity::class.java)
+                startActivity(intent)
             }
         }
 
@@ -74,7 +80,9 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
             CartManager.getAllItems(),
             onPlusClick = { cartItem -> changeQuantity(cartItem, +1) },
             onMinusClick = { cartItem -> changeQuantity(cartItem, -1) },
-            onDeleteClick = { cartItem -> deleteItem(cartItem) }
+            onDeleteClick = { cartItem -> deleteItem(cartItem) },
+            onEditClick = { cartItem -> editCartItem(cartItem) }   // NEW
+
         )
 
         rvCartItems.layoutManager = LinearLayoutManager(context)
@@ -93,6 +101,18 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
         CartManager.removeItem(cartItem.item._id, cartItem.customizations)
         refreshCart()
         Toast.makeText(context, "Đã xóa sản phẩm", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun editCartItem(cartItem: CartItem) {
+        val dialog = ItemCustomizationDialogFragment.newInstance(cartItem.item)
+        dialog.setOnAddToCartListener { newCartItem ->
+            // Remove old line (same _id + old customizations)
+            CartManager.removeItem(cartItem.item._id, cartItem.customizations)
+            // Add updated line with new customizations and price
+            CartManager.addItem(newCartItem)
+            refreshCart()
+        }
+        dialog.show(parentFragmentManager, "edit_cart_item_dialog")
     }
 
     private fun refreshCart() {

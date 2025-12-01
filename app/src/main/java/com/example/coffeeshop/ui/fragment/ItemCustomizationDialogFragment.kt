@@ -126,13 +126,14 @@ class ItemCustomizationDialogFragment : DialogFragment() {
                 return@setOnClickListener
             }
 
-            val sizeChosen = if (item.sizes.isNotEmpty()) {
-                item.sizes.getOrNull(spSize.selectedItemPosition)?.name ?: ""
-            } else ""
+            // Get selected objects
+            val sizeObj = if (item.sizes.isNotEmpty()) {
+                item.sizes.getOrNull(spSize.selectedItemPosition)
+            } else null
 
-            val tempChosen = if (item.tempOptions.isNotEmpty()) {
-                item.tempOptions.getOrNull(spTemp.selectedItemPosition)?.name ?: ""
-            } else ""
+            val tempObj = if (item.tempOptions.isNotEmpty()) {
+                item.tempOptions.getOrNull(spTemp.selectedItemPosition)
+            } else null
 
             val iceLevel = if (item.iceLevels.isNotEmpty()) {
                 item.iceLevels.getOrNull(spIceLevel.selectedItemPosition) ?: ""
@@ -142,15 +143,43 @@ class ItemCustomizationDialogFragment : DialogFragment() {
                 item.sugarLevels.getOrNull(spSugarLevel.selectedItemPosition) ?: ""
             } else ""
 
-            // Build customizations map
+            // Later: collect chosen topping names here when you have UI for toppings
+            val chosenToppings: List<String> = emptyList()
+
+            // Build customizations map (used by CartManager to distinguish lines)
             val customizations = mutableMapOf<String, String>()
-            if (sizeChosen.isNotBlank()) customizations["size"] = sizeChosen
-            if (tempChosen.isNotBlank()) customizations["temp"] = tempChosen
+            sizeObj?.let { customizations["size"] = it.name }
+            tempObj?.let { customizations["temp"] = it.name }
             if (iceLevel.isNotBlank()) customizations["ice"] = iceLevel
             if (sugarLevel.isNotBlank()) customizations["sugar"] = sugarLevel
             if (etNote.text.toString().isNotBlank()) customizations["note"] = etNote.text.toString()
+            if (chosenToppings.isNotEmpty()) {
+                customizations["toppings"] = chosenToppings.joinToString()
+            }
 
-            val unitPrice = item.basePrice  // extend later with modifiers if needed
+            // ===== Calculate unit price with modifiers =====
+            var unitPrice = item.basePrice
+
+            // Size modifier
+            if (sizeObj != null) {
+                unitPrice += sizeObj.modifier
+            }
+
+            // Temp modifier
+            if (tempObj != null) {
+                unitPrice += tempObj.modifier
+            }
+
+            // Toppings modifiers (when implemented)
+            if (chosenToppings.isNotEmpty()) {
+                chosenToppings.forEach { topName ->
+                    val topping = item.toppings.firstOrNull { it.name == topName }
+                    if (topping != null) {
+                        unitPrice += topping.price
+                    }
+                }
+            }
+
             val cartItem = CartItem(
                 item = item,
                 quantity = quantity,
