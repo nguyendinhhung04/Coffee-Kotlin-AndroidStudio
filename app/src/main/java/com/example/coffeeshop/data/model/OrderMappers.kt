@@ -42,7 +42,7 @@ fun buildOrderDTOFromCart(
     val cartItems = CartManager.getAllItems()
     val subtotal = CartManager.getSubtotal()
     val discount = 0.0
-    val shipping = 15000.0
+    val shipping = 0.0
     val taxes = 0.0
     val total = subtotal - discount + shipping + taxes
 

@@ -76,11 +76,21 @@ class CartItemAdapter(
         val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
         holder.tvPrice.text = formatter.format(cartItem.getTotalPrice())
 
-        Glide.with(holder.itemView.context)
-            .load(item.image_url)
-            .placeholder(R.drawable.socola)
-            .error(R.drawable.socola)
-            .into(holder.ivImage)
+        // ===== Load image from assets/item_img/ =====
+        val context = holder.itemView.context
+        val imageName = item.image_url
+
+        try {
+            val inputStream = context.assets.open("item_img/$imageName")
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            holder.ivImage.setImageBitmap(bitmap)
+            inputStream.close()
+
+            Log.d("CartAdapter", "Loaded asset image: item_img/$imageName")
+        } catch (e: Exception) {
+            Log.w("CartAdapter", "Image not found in assets: item_img/$imageName → ${e.message}")
+            holder.ivImage.setImageResource(R.drawable.socola)
+        }
 
         holder.btnPlus.setOnClickListener { onPlusClick(cartItem) }
         holder.btnMinus.setOnClickListener { onMinusClick(cartItem) }

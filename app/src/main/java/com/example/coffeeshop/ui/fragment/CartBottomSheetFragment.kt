@@ -164,6 +164,8 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
         val items = CartManager.getAllItems()
         val subtotal = CartManager.getSubtotal()
 
+        val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
+
         if (items.isEmpty()) {
             tvEmptyCart.visibility = View.VISIBLE
             rvCartItems.visibility = View.GONE
@@ -177,12 +179,8 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
             btnCheckout.isEnabled = true
             btnClear.isEnabled = true
 
-            val shippingFee = 15000.0
-            val total = subtotal + shippingFee
-
-            val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
             tvSubtotal.text = formatter.format(subtotal)
-            tvTotal.text = formatter.format(total)
+            tvTotal.text = formatter.format(subtotal)   // ở layout bạn có thể đổi label thành "Tạm tính"
         }
     }
 
