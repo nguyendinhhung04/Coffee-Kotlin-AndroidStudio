@@ -33,10 +33,10 @@ class OrderItemAdapter(
         holder.tvOrderItemName.text = "${item.productName} - x${item.quantity}"
 
         val options = mutableListOf<String>()
-        if (item.sizeChosen.isNotEmpty()) options.add("Size: ${item.sizeChosen}")
-        if (item.tempChosen.isNotEmpty()) options.add(item.tempChosen)
-        if (item.iceLevel.isNotEmpty() && item.iceLevel != "N/A") options.add("Đá: ${item.iceLevel}")
-        if (item.sugarLevel.isNotEmpty() && item.sugarLevel != "N/A") options.add("Đường: ${item.sugarLevel}")
+        if (!item.sizeChosen.isNullOrEmpty()) options.add("Size: ${item.sizeChosen}")
+        if (!item.tempChosen.isNullOrEmpty()) options.add(item.tempChosen!!)
+        if (!item.iceLevel.isNullOrEmpty() && item.iceLevel != "N/A") options.add("Đá: ${item.iceLevel}")
+        if (!item.sugarLevel.isNullOrEmpty() && item.sugarLevel != "N/A") options.add("Đường: ${item.sugarLevel}")
         if (item.chosenToppings.isNotEmpty()) {
             options.add("Topping: ${item.chosenToppings.joinToString(", ") { it.name }}")
         }
@@ -46,7 +46,7 @@ class OrderItemAdapter(
         val itemTotal = item.finalUnitPrice * item.quantity
         holder.tvOrderItemPrice.text = "${formatter.format(item.finalUnitPrice)} x ${item.quantity} = ${formatter.format(itemTotal)}"
 
-        if (item.itemNote.isNotEmpty()) {
+        if (!item.itemNote.isNullOrEmpty()) {
             holder.tvOrderItemNote.text = "Ghi chú: ${item.itemNote}"
             holder.tvOrderItemNote.visibility = View.VISIBLE
         } else {

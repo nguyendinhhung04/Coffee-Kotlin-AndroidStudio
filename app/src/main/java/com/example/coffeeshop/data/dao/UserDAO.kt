@@ -7,7 +7,7 @@ import java.io.IOException
 
 object UserDAO {
     private val client = OkHttpClient()
-    private const val BASE_URL = "https://c76lgf-3000.csb.app"
+    private const val BASE_URL = "http://10.0.2.2:3000"
 
     fun checkLogin(username: String, password: String, callback: (success: Boolean, message: String, user: JSONObject?) -> Unit) {
         val json = JSONObject().apply {
@@ -21,7 +21,7 @@ object UserDAO {
         )
 
         val request = Request.Builder()
-            .url("$BASE_URL/login")
+            .url("$BASE_URL/api/auth/login")
             .post(requestBody)
             .build()
 
@@ -32,13 +32,23 @@ object UserDAO {
 
             override fun onResponse(call: Call, response: Response) {
                 val responseBody = response.body?.string()
-                if (response.isSuccessful && responseBody != null) {
-                    val jsonRes = JSONObject(responseBody)
-                    val message = jsonRes.optString("message", "")
-                    val user = jsonRes.optJSONObject("user")
-                    callback(true, message, user)
+                if (responseBody != null) {
+                    try {
+                        val jsonRes = JSONObject(responseBody)
+                        val success = jsonRes.optBoolean("success", false)
+                        val message = jsonRes.optString("message", "Login failed!")
+                        
+                        if (response.isSuccessful && success) {
+                            val user = jsonRes.optJSONObject("user")
+                            callback(true, message, user)
+                        } else {
+                            callback(false, message, null)
+                        }
+                    } catch (e: Exception) {
+                        callback(false, "Error parsing response: ${e.message}", null)
+                    }
                 } else {
-                    callback(false, "Login failed!", null)
+                    callback(false, "Login failed! No response from server.", null)
                 }
             }
         })
@@ -58,7 +68,7 @@ object UserDAO {
         val body = RequestBody.create(mediaType, json.toString())
 
         val request = Request.Builder()
-            .url("$BASE_URL/register")
+            .url("$BASE_URL/api/auth/register")
             .post(body)
             .build()
 

@@ -81,7 +81,7 @@ class AdminAddMenuItemActivity : AppCompatActivity() {
         val newItem = Item(
             _id = null, // Backend will generate this
             name = name,
-            category = category,
+            categories = listOf(category), // Convert single category to list
             image_url = imageUrl,
             basePrice = basePrice,
             description = description,

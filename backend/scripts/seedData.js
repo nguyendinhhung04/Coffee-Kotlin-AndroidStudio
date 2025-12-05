@@ -138,9 +138,17 @@ const sampleUsers = [
     role: "admin"
   },
   {
+    username: "nguyenvana",
+    password: "admin",
+    fullName: "Nguyễn Văn A",
+    email: "nguyenvana@coffeeshop.com",
+    phone: "0123456789",
+    role: "admin"
+  },
+  {
     username: "user1",
     password: "user123",
-    fullName: "Nguyễn Văn A",
+    fullName: "Nguyễn Văn B",
     email: "user1@example.com",
     phone: "0987654321",
     role: "user"
@@ -333,6 +341,7 @@ async function seedDatabase() {
     console.log('\n✅ Database seeding completed!');
     console.log('\n📝 Login credentials:');
     console.log('   Admin: username="admin", password="admin123"');
+    console.log('   Admin: username="nguyenvana", password="admin"');
     console.log('   User:  username="user1", password="user123"');
     
     process.exit(0);

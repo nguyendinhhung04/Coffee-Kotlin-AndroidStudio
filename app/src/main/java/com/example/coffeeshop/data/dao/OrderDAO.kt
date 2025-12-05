@@ -10,7 +10,7 @@ import java.io.IOException
 
 object OrderDAO {
     private val client = OkHttpClient()
-    private const val BASE_URL = "https://c76lgf-3000.csb.app"
+    private const val BASE_URL = "http://10.0.2.2:3000"
     private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
 
     // 🟢 CREATE - Tạo order mới
@@ -78,7 +78,7 @@ object OrderDAO {
 
         val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
         val request = Request.Builder()
-            .url("$BASE_URL/orders/create")
+            .url("$BASE_URL/api/orders/create")
             .post(body)
             .build()
 
@@ -110,7 +110,7 @@ object OrderDAO {
         callback: (success: Boolean, message: String, order: Order?) -> Unit
     ) {
         val request = Request.Builder()
-            .url("$BASE_URL/orders/$orderId")
+            .url("$BASE_URL/api/orders/$orderId")
             .get()
             .build()
 
@@ -138,7 +138,7 @@ object OrderDAO {
     // 🔵 READ ALL - Lấy tất cả đơn hàng
     fun getAllOrders(callback: (Boolean, String, List<Order>?) -> Unit) {
         val request = Request.Builder()
-            .url("$BASE_URL/orders")
+            .url("$BASE_URL/api/orders")
             .get()
             .build()
 
@@ -174,7 +174,7 @@ object OrderDAO {
         userId: String,
         callback: (success: Boolean, message: String, orders: List<Order>?) -> Unit
     ) {
-        val url = "$BASE_URL/orders?userId=$userId"
+        val url = "$BASE_URL/api/orders?userId=$userId"
         val request = Request.Builder().url(url).get().build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -216,7 +216,7 @@ object OrderDAO {
 
         val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
         val request = Request.Builder()
-            .url("$BASE_URL/orders/$orderId")
+            .url("$BASE_URL/api/orders/$orderId")
             .put(body)
             .build()
 
@@ -241,7 +241,7 @@ object OrderDAO {
         callback: (success: Boolean, message: String) -> Unit
     ) {
         val request = Request.Builder()
-            .url("$BASE_URL/orders/$orderId")
+            .url("$BASE_URL/api/orders/$orderId")
             .delete()
             .build()
 

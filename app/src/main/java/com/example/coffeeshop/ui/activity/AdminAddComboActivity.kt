@@ -1,7 +1,9 @@
 package com.example.coffeeshop.ui.activity
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,7 +14,8 @@ import com.example.coffeeshop.data.model.Combo
 import com.example.coffeeshop.data.model.Item
 import com.example.coffeeshop.data.model.OrderItem
 import com.example.coffeeshop.data.model.Topping
-import com.example.coffeeshop.ui.adapter.DrinkItemAdapter
+import com.example.coffeeshop.ui.adapter.ItemListAdapter
+import com.example.coffeeshop.ui.adapter.OrderItemAdapter
 import com.google.android.material.textfield.TextInputEditText
 import java.util.*
 
@@ -23,9 +26,12 @@ class AdminAddComboActivity : AppCompatActivity() {
     private lateinit var etComboImageUrl: TextInputEditText
     private lateinit var etComboBasePrice: TextInputEditText
     private lateinit var rvAvailableItems: RecyclerView
+    private lateinit var rvSelectedItems: RecyclerView
+    private lateinit var tvSelectedItemsCount: TextView
     private lateinit var btnAddCombo: Button
 
-    private lateinit var drinkItemAdapter: DrinkItemAdapter
+    private lateinit var itemListAdapter: ItemListAdapter
+    private lateinit var selectedItemsAdapter: OrderItemAdapter
     private val selectedComboItems = mutableListOf<OrderItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,18 +50,27 @@ class AdminAddComboActivity : AppCompatActivity() {
         etComboImageUrl = findViewById(R.id.etComboImageUrl)
         etComboBasePrice = findViewById(R.id.etComboBasePrice)
         rvAvailableItems = findViewById(R.id.rvAvailableItems)
+        rvSelectedItems = findViewById(R.id.rvSelectedItems)
+        tvSelectedItemsCount = findViewById(R.id.tvSelectedItemsCount)
         btnAddCombo = findViewById(R.id.btnAddCombo)
     }
 
     private fun setupRecyclerView() {
-        drinkItemAdapter = DrinkItemAdapter(emptyList()) { item ->
+        itemListAdapter = ItemListAdapter(emptyList()) { item ->
             // When an item is clicked, add it to the selectedComboItems
             addOrUpdateComboItem(item)
         }
         rvAvailableItems.apply {
             layoutManager = LinearLayoutManager(this@AdminAddComboActivity)
-            adapter = drinkItemAdapter
+            adapter = itemListAdapter
             isNestedScrollingEnabled = false // To allow scrolling of parent ScrollView
+        }
+
+        selectedItemsAdapter = OrderItemAdapter(emptyList())
+        rvSelectedItems.apply {
+            layoutManager = LinearLayoutManager(this@AdminAddComboActivity)
+            adapter = selectedItemsAdapter
+            isNestedScrollingEnabled = false
         }
     }
 
@@ -63,7 +78,7 @@ class AdminAddComboActivity : AppCompatActivity() {
         ItemDAO.getAllItems { success, message, items ->
             runOnUiThread {
                 if (success && items != null) {
-                    drinkItemAdapter.updateItems(items)
+                    itemListAdapter.updateItems(items)
                 } else {
                     Toast.makeText(this, "Không thể tải danh sách món: $message", Toast.LENGTH_LONG).show()
                 }
@@ -96,7 +111,17 @@ class AdminAddComboActivity : AppCompatActivity() {
             selectedComboItems.add(newOrderItem)
             Toast.makeText(this, "Đã thêm ${item.name} vào combo.", Toast.LENGTH_SHORT).show()
         }
-        // TODO: Update a visual indicator of selected items for the combo
+        updateSelectedItemsDisplay()
+    }
+
+    private fun updateSelectedItemsDisplay() {
+        selectedItemsAdapter.updateOrderItems(selectedComboItems)
+        tvSelectedItemsCount.text = "Đã chọn: ${selectedComboItems.size} món"
+        if (selectedComboItems.isNotEmpty()) {
+            rvSelectedItems.visibility = View.VISIBLE
+        } else {
+            rvSelectedItems.visibility = View.GONE
+        }
     }
 
     private fun createNewCombo() {

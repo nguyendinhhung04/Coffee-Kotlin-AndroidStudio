@@ -82,7 +82,26 @@
             android:nestedScrollingEnabled="false"
             android:layout_marginBottom="16dp"
             tools:itemCount="3"
-            tools:listitem="@layout/item_drink"/>
+            tools:listitem="@layout/item_drink_card_simple"/>
+
+        <TextView
+            android:id="@+id/tvSelectedItemsCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đã chọn: 0 món"
+            android:textStyle="bold"
+            android:textColor="@color/brown"
+            android:layout_marginBottom="8dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSelectedItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            tools:itemCount="2"
+            tools:listitem="@layout/item_order_detail"/>
 
         <Button
             android:id="@+id/btnAddCombo"

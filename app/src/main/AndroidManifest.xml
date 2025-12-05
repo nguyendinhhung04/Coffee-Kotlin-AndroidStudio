@@ -46,8 +46,6 @@
             android:name=".ui.activity.FavoritesActivity"
             android:exported="false" />
 
-<<<<<<< Updated upstream
-=======
         <activity
             android:name=".ui.activity.PaymentActivity"
             android:exported="false" />
@@ -60,6 +58,30 @@
             android:name=".ui.activity.LuckyWheelActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.activity.AdminDashboardActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.AdminOrderListActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.AdminOrderDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.AdminManageMenuItemsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.AdminAddMenuItemActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.AdminAddComboActivity"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -69,7 +91,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
->>>>>>> Stashed changes
 
     </application>
 

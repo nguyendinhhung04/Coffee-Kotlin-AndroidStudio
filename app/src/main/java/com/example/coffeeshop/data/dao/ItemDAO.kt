@@ -15,7 +15,7 @@ import com.example.coffeeshop.data.model.OrderItem
 
 object ItemDAO {
     private val client = OkHttpClient()
-    private const val BASE_URL = "https://c76lgf-3000.csb.app"
+    private const val BASE_URL = "http://10.0.2.2:3000"
     private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
 
     // ----------------------------
@@ -57,7 +57,7 @@ object ItemDAO {
 
         val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
         val request = Request.Builder()
-            .url("$BASE_URL/combos") // Assuming a /combos endpoint
+            .url("$BASE_URL/api/combos")
             .post(body)
             .build()
 
@@ -131,7 +131,7 @@ object ItemDAO {
     fun createItem(item: Item, callback: (Boolean, String, Item?) -> Unit) {
         val json = JSONObject().apply {
             put("name", item.name)
-            put("category", item.category)
+            put("categories", JSONArray(item.categories))
             put("image_url", item.image_url)
             put("basePrice", item.basePrice)
             put("description", item.description)
@@ -172,7 +172,7 @@ object ItemDAO {
 
         val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
         val request = Request.Builder()
-            .url("$BASE_URL/items")
+            .url("$BASE_URL/api/items")
             .post(body)
             .build()
 
@@ -189,7 +189,7 @@ object ItemDAO {
                         val createdItem = Item(
                             _id = jsonResponse.optString("_id"),
                             name = jsonResponse.optString("name"),
-                            category = jsonResponse.optString("category"),
+                            categories = jsonArrayToStringList(jsonResponse.optJSONArray("categories")),
                             image_url = jsonResponse.optString("image_url"),
                             basePrice = jsonResponse.optDouble("basePrice"),
                             description = jsonResponse.optString("description"),
@@ -216,7 +216,7 @@ object ItemDAO {
     // ----------------------------
     fun getAllItems(callback: (Boolean, String, List<Item>?) -> Unit) {
         val request = Request.Builder()
-            .url("$BASE_URL/items")
+            .url("$BASE_URL/api/items")
             .get()
             .build()
 
@@ -243,7 +243,7 @@ object ItemDAO {
                             val item = Item(
                                 _id = obj.optString("_id"),
                                 name = obj.optString("name"),
-                                category = obj.optString("category"),
+                                categories = jsonArrayToStringList(obj.optJSONArray("categories")),
                                 image_url = obj.optString("image_url"),
                                 basePrice = obj.optDouble("basePrice"),
                                 description = obj.optString("description"),
@@ -273,7 +273,7 @@ object ItemDAO {
     // Lọc theo category
     // ----------------------------
     fun getItemsByCategory(category: String, callback: (Boolean, String, List<Item>?) -> Unit) {
-        val url = "$BASE_URL/items?category=$category"
+        val url = "$BASE_URL/api/items?category=$category"
         val request = Request.Builder().url(url).get().build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -298,7 +298,7 @@ object ItemDAO {
                             val item = Item(
                                 _id = obj.optString("_id"),
                                 name = obj.optString("name"),
-                                category = obj.optString("category"),
+                                categories = jsonArrayToStringList(obj.optJSONArray("categories")),
                                 image_url = obj.optString("image_url"),
                                 basePrice = obj.optDouble("basePrice"),
                                 description = obj.optString("description"),
@@ -327,7 +327,7 @@ object ItemDAO {
     // Tìm kiếm
     // ----------------------------
     fun searchItems(query: String, callback: (Boolean, String, List<Item>?) -> Unit) {
-        val url = "$BASE_URL/items?search=$query"
+        val url = "$BASE_URL/api/items?search=$query"
         val request = Request.Builder().url(url).get().build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -352,7 +352,7 @@ object ItemDAO {
                             val item = Item(
                                 _id = obj.optString("_id"),
                                 name = obj.optString("name"),
-                                category = obj.optString("category"),
+                                categories = jsonArrayToStringList(obj.optJSONArray("categories")),
                                 image_url = obj.optString("image_url"),
                                 basePrice = obj.optDouble("basePrice"),
                                 description = obj.optString("description"),
@@ -432,7 +432,7 @@ object ItemDAO {
                 val recommendedItems = allItems.filter { item ->
                     val itemNameLower = item.name.lowercase()
                     val itemDescLower = item.description.lowercase()
-                    val itemCategoryLower = item.category.lowercase()
+                    val itemCategoryLower = item.categories.joinToString(" ").lowercase()
                     
                     // Kiểm tra xem món có chứa từ khóa mùa không
                     seasonKeywords.any { keyword ->
@@ -459,7 +459,7 @@ object ItemDAO {
                 val recommendedItems = allItems.filter { item ->
                     val itemNameLower = item.name.lowercase()
                     val itemDescLower = item.description.lowercase()
-                    val itemCategoryLower = item.category.lowercase()
+                    val itemCategoryLower = item.categories.joinToString(" ").lowercase()
                     
                     // Kiểm tra xem món có chứa từ khóa thời tiết không
                     weatherKeywords.any { keyword ->

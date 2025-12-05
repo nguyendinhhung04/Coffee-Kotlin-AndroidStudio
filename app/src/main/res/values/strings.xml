@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">CoffeeShop</string>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
     <string name="terms_and_conditions">Terms &amp; Conditions</string>
     <string name="lucky_wheel_title">Vòng quay may mắn</string>
     <string name="lucky_wheel_subtitle">Chúc bạn may mắn!</string>
@@ -10,8 +7,6 @@
     <string name="congratulations">Chúc mừng!</string>
     <string name="lucky_wheel_prize_text">Bạn đã nhận được phần thưởng</string>
     <string name="use_now">Sử dụng ngay</string>
->>>>>>> Stashed changes
-=======
     <string name="cart">Cart</string>
     <string name="no_customization">Không có tùy chọn</string>
     <string-array name="order_statuses">
@@ -21,5 +16,4 @@
         <item>Delivered</item>
         <item>Cancelled</item>
     </string-array>
->>>>>>> Stashed changes
 </resources>

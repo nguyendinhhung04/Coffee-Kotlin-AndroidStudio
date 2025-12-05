@@ -219,7 +219,7 @@
                                 android:id="@+id/ivRecommendedDrink1"
                                 android:layout_width="match_parent"
                                 android:layout_height="90dp"
-                                android:src="@drawable/placeholder_coffee"
+                                android:src="@drawable/socola"
                                 android:scaleType="centerCrop" />
 
                             <TextView
@@ -259,7 +259,7 @@
                                 android:id="@+id/ivRecommendedDrink2"
                                 android:layout_width="match_parent"
                                 android:layout_height="90dp"
-                                android:src="@drawable/placeholder_coffee"
+                                android:src="@drawable/socola"
                                 android:scaleType="centerCrop" />
 
                             <TextView
@@ -465,7 +465,7 @@
         android:id="@+id/bottom_navigation_payment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/bottom_nav_menu"
+        app:menu="@menu/bottom_navigation_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

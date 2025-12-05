@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment
 import com.example.coffeeshop.R
 import com.example.coffeeshop.data.dao.UserDAO
 import com.example.coffeeshop.ui.activity.MainActivity
+import com.example.coffeeshop.ui.activity.AdminDashboardActivity
+import com.example.coffeeshop.utils.UserSessionManager
 import com.google.android.material.button.MaterialButton
 
 class LoginFragment : Fragment() {
@@ -40,8 +42,25 @@ class LoginFragment : Fragment() {
                 requireActivity().runOnUiThread {
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                     if (success && user != null) {
-                        val intent = Intent(requireContext(), MainActivity::class.java)
-                        intent.putExtra("username", user.optString("username"))
+                        // Lưu thông tin user vào session
+                        val sessionManager = UserSessionManager(requireContext())
+                        val userId = user.optString("_id", "")
+                        val username = user.optString("username", "")
+                        val role = user.optString("role", "user")
+                        val fullName = user.optString("fullName", null)
+                        val email = user.optString("email", null)
+                        val phone = user.optString("phone", null)
+                        
+                        sessionManager.saveUserSession(userId, username, role, fullName, email, phone)
+                        
+                        // Redirect dựa trên role
+                        val intent = if (role == "admin") {
+                            Intent(requireContext(), AdminDashboardActivity::class.java)
+                        } else {
+                            Intent(requireContext(), MainActivity::class.java).apply {
+                                putExtra("username", username)
+                            }
+                        }
                         startActivity(intent)
                         requireActivity().finish()
                     }
