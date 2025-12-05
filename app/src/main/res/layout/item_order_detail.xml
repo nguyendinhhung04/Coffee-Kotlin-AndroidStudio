@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tvOrderItemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            tools:text="Espresso - x2"/>
+
+        <TextView
+            android:id="@+id/tvOrderItemOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            tools:text="Size: M | Temp: Hot | Đá: Ít | Đường: Vừa | Topping: Kem"/>
+
+        <TextView
+            android:id="@+id/tvOrderItemPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textStyle="italic"
+            tools:text="2 x 50.000 = 100.000 VNĐ"/>
+
+        <TextView
+            android:id="@+id/tvOrderItemNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            tools:text="Ghi chú: Thêm đường"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

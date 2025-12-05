@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activity.AdminAddMenuItemActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thêm Món Mới"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tên món"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Danh mục (coffee, chocolate, other)"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemImageUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="URL hình ảnh (ví dụ: coffee_image.png)"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemBasePrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Giá cơ bản"
+                android:inputType="numberDecimal"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Mô tả"
+                android:inputType="textMultiLine"
+                android:minLines="3"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kích thước (ví dụ: S:0,M:5000,L:10000)"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemSizes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="S:0,M:5000,L:10000"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tùy chọn nhiệt độ (ví dụ: Hot:0,Iced:0)"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemTempOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Hot:0,Iced:0"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cấp độ đá (ví dụ: 0%,50%,100%,N/A)"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemIceLevels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="0%,50%,100%,N/A"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cấp độ đường (ví dụ: 0%,50%,100%,N/A)"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemSugarLevels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="0%,50%,100%,N/A"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Topping (ví dụ: Trân châu:5000,Thạch:3000)"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etItemToppings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Trân châu:5000,Thạch:3000"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/btnAddItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thêm Món"/>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -6,14 +6,210 @@ import com.example.coffeeshop.data.model.TempOption
 import com.example.coffeeshop.data.model.Topping
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
+import com.example.coffeeshop.data.model.Combo
+import com.example.coffeeshop.data.model.OrderItem
 
 object ItemDAO {
     private val client = OkHttpClient()
     private const val BASE_URL = "https://c76lgf-3000.csb.app"
     private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
+
+    // ----------------------------
+    // Tạo combo mới
+    // ----------------------------
+    fun createCombo(combo: Combo, callback: (Boolean, String, Combo?) -> Unit) {
+        val json = JSONObject().apply {
+            put("name", combo.name)
+            put("description", combo.description)
+            put("image_url", combo.image_url)
+            put("basePrice", combo.basePrice)
+            put("isActive", combo.isActive)
+
+            val itemsArray = JSONArray()
+            combo.items.forEach { orderItem ->
+                val itemObj = JSONObject().apply {
+                    put("productId", orderItem.productId)
+                    put("productName", orderItem.productName)
+                    put("quantity", orderItem.quantity)
+                    put("finalUnitPrice", orderItem.finalUnitPrice)
+                    put("sizeChosen", orderItem.sizeChosen)
+                    put("tempChosen", orderItem.tempChosen)
+                    put("iceLevel", orderItem.iceLevel)
+                    put("sugarLevel", orderItem.sugarLevel)
+                    val toppingsArray = JSONArray()
+                    orderItem.chosenToppings.forEach { topping ->
+                        toppingsArray.put(JSONObject().apply {
+                            put("name", topping.name)
+                            put("price", topping.price)
+                        })
+                    }
+                    put("chosenToppings", toppingsArray)
+                    put("itemNote", orderItem.itemNote)
+                }
+                itemsArray.put(itemObj)
+            }
+            put("items", itemsArray)
+        }
+
+        val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
+        val request = Request.Builder()
+            .url("$BASE_URL/combos") // Assuming a /combos endpoint
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false, "Lỗi mạng: ${e.message}", null)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string()
+                if (response.isSuccessful && responseBody != null) {
+                    try {
+                        val jsonResponse = JSONObject(responseBody)
+                        val createdCombo = parseCombo(jsonResponse)
+                        callback(true, "Thêm combo thành công", createdCombo)
+                    } catch (e: Exception) {
+                        callback(false, "Lỗi parse JSON: ${e.message}", null)
+                    }
+                } else {
+                    callback(false, "Lỗi server: ${response.code}", null)
+                }
+            }
+        })
+    }
+
+    private fun parseCombo(obj: JSONObject): Combo {
+        val itemsArray = obj.optJSONArray("items")
+        val orderItems = mutableListOf<OrderItem>()
+        if (itemsArray != null) {
+            for (i in 0 until itemsArray.length()) {
+                val itemJson = itemsArray.getJSONObject(i)
+                val toppingsArray = itemJson.optJSONArray("chosenToppings")
+                val chosenToppings = mutableListOf<Topping>()
+                if (toppingsArray != null) {
+                    for (j in 0 until toppingsArray.length()) {
+                        val toppingJson = toppingsArray.getJSONObject(j)
+                        chosenToppings.add(Topping(
+                            name = toppingJson.optString("name"),
+                            price = toppingJson.optDouble("price")
+                        ))
+                    }
+                }
+                orderItems.add(OrderItem(
+                    productId = itemJson.optString("productId"),
+                    productName = itemJson.optString("productName"),
+                    quantity = itemJson.optInt("quantity", 1),
+                    finalUnitPrice = itemJson.optDouble("finalUnitPrice"),
+                    sizeChosen = itemJson.optString("sizeChosen"),
+                    tempChosen = itemJson.optString("tempChosen"),
+                    iceLevel = itemJson.optString("iceLevel"),
+                    sugarLevel = itemJson.optString("sugarLevel"),
+                    chosenToppings = chosenToppings,
+                    itemNote = itemJson.optString("itemNote")
+                ))
+            }
+        }
+        return Combo(
+            _id = obj.optString("_id"),
+            name = obj.optString("name"),
+            description = obj.optString("description"),
+            image_url = obj.optString("image_url"),
+            basePrice = obj.optDouble("basePrice"),
+            items = orderItems,
+            isActive = obj.optBoolean("isActive", true)
+        )
+    }
+
+    // ----------------------------
+    // Tạo món mới
+    // ----------------------------
+    fun createItem(item: Item, callback: (Boolean, String, Item?) -> Unit) {
+        val json = JSONObject().apply {
+            put("name", item.name)
+            put("category", item.category)
+            put("image_url", item.image_url)
+            put("basePrice", item.basePrice)
+            put("description", item.description)
+
+            val sizesArray = JSONArray()
+            item.sizes.forEach { size ->
+                sizesArray.put(JSONObject().apply {
+                    put("name", size.name)
+                    put("modifier", size.modifier)
+                    put("label", size.label)
+                })
+            }
+            put("sizes", sizesArray)
+
+            val tempOptionsArray = JSONArray()
+            item.tempOptions.forEach { temp ->
+                tempOptionsArray.put(JSONObject().apply {
+                    put("name", temp.name)
+                    put("modifier", temp.modifier)
+                    put("label", temp.label)
+                })
+            }
+            put("tempOptions", tempOptionsArray)
+
+            val toppingsArray = JSONArray()
+            item.toppings.forEach { topping ->
+                toppingsArray.put(JSONObject().apply {
+                    put("name", topping.name)
+                    put("price", topping.price)
+                })
+            }
+            put("toppings", toppingsArray)
+
+            put("iceLevels", JSONArray(item.iceLevels))
+            put("sugarLevels", JSONArray(item.sugarLevels))
+            put("isActive", item.isActive)
+        }
+
+        val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
+        val request = Request.Builder()
+            .url("$BASE_URL/items")
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false, "Lỗi mạng: ${e.message}", null)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string()
+                if (response.isSuccessful && responseBody != null) {
+                    try {
+                        val jsonResponse = JSONObject(responseBody)
+                        val createdItem = Item(
+                            _id = jsonResponse.optString("_id"),
+                            name = jsonResponse.optString("name"),
+                            category = jsonResponse.optString("category"),
+                            image_url = jsonResponse.optString("image_url"),
+                            basePrice = jsonResponse.optDouble("basePrice"),
+                            description = jsonResponse.optString("description"),
+                            sizes = parseSizes(jsonResponse.optJSONArray("sizes")),
+                            tempOptions = parseTempOptions(jsonResponse.optJSONArray("tempOptions")),
+                            iceLevels = jsonArrayToStringList(jsonResponse.optJSONArray("iceLevels")),
+                            sugarLevels = jsonArrayToStringList(jsonResponse.optJSONArray("sugarLevels")),
+                            toppings = parseToppings(jsonResponse.optJSONArray("toppings")),
+                            isActive = jsonResponse.optBoolean("isActive", true)
+                        )
+                        callback(true, "Thêm món thành công", createdItem)
+                    } catch (e: Exception) {
+                        callback(false, "Lỗi parse JSON: ${e.message}", null)
+                    }
+                } else {
+                    callback(false, "Lỗi server: ${response.code}", null)
+                }
+            }
+        })
+    }
 
     // ----------------------------
     // Lấy tất cả món

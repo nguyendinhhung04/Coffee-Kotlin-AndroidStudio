@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activity.AdminOrderDetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chi tiết Đơn hàng"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Order ID -->
+        <TextView
+            android:id="@+id/tvDetailOrderId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"
+            tools:text="Order ID: #12345"/>
+
+        <!-- Order Date -->
+        <TextView
+            android:id="@+id/tvDetailOrderDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            tools:text="Date: 2023-11-20 10:30 AM"/>
+
+        <!-- User ID -->
+        <TextView
+            android:id="@+id/tvDetailUserId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            tools:text="User ID: user123"/>
+
+        <!-- Current Status -->
+        <TextView
+            android:id="@+id/tvDetailOrderStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            tools:text="Status: Pending"/>
+
+        <!-- Delivery Address -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Địa chỉ giao hàng:"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tvDetailDeliveryAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            tools:text="John Doe, 0987654321\n123 ABC Street, Ward X, District Y, City Z"/>
+
+        <!-- Order Items -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Các món trong đơn:"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvDetailOrderItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="16dp"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_cart"/>
+
+        <!-- Summary -->
+        <TextView
+            android:id="@+id/tvDetailSubtotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Tổng phụ: 120.000 VNĐ"/>
+
+        <TextView
+            android:id="@+id/tvDetailDiscount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Giảm giá: 0 VNĐ"/>
+
+        <TextView
+            android:id="@+id/tvDetailShipping"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Phí vận chuyển: 20.000 VNĐ"/>
+
+        <TextView
+            android:id="@+id/tvDetailTaxes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Thuế: 10.000 VNĐ"/>
+
+        <TextView
+            android:id="@+id/tvDetailTotalAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            tools:text="Tổng cộng: 150.000 VNĐ"/>
+
+        <!-- Change Status Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thay đổi trạng thái:"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <Spinner
+                android:id="@+id/spinnerOrderStatus"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:entries="@array/order_statuses"
+                android:minHeight="48dp"/>
+
+            <Button
+                android:id="@+id/btnUpdateStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cập nhật"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
