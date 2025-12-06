@@ -39,6 +39,8 @@
             android:name=".ui.activity.YourOrderActivity"
             android:exported="false" />
 
+        <activity android:name=".ui.activity.OrderDetailActivity" />
+
         <activity
             android:name=".ui.activity.FavoritesActivity"
             android:exported="false" />

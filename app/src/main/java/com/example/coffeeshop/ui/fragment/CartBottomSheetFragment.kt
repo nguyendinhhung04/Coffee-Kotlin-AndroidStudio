@@ -61,7 +61,7 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
             if (CartManager.isEmpty()) {
                 Toast.makeText(context, "Giỏ hàng trống", Toast.LENGTH_SHORT).show()
             } else {
-                // Tạo order status = Unpaid và gọi API
+                // Tạo order status = Pending và gọi API
                 viewLifecycleOwner.lifecycleScope.launch {
                     val userId = sessionManager.getUserId()
                     if (userId.isNullOrEmpty()) {
@@ -80,7 +80,7 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
 
                     val orderDTO = buildOrderDTOFromCart(
                         userId = userId,
-                        status = "Unpaid",
+                        status = "Pending",
                         paymentMethod = "COD",
                         deliveryAddress = address
                     )

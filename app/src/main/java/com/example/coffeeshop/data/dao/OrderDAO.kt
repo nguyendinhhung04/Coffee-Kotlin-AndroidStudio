@@ -10,7 +10,7 @@ import java.io.IOException
 
 object OrderDAO {
     private val client = OkHttpClient()
-    private const val BASE_URL = "https://c76lgf-3000.csb.app/order"
+    private const val BASE_URL = "https://c76lgf-3000.csb.app"
     private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
 
     // 🟢 CREATE - Tạo order mới
@@ -140,7 +140,7 @@ object OrderDAO {
         userId: String,
         callback: (success: Boolean, message: String, orders: List<Order>?) -> Unit
     ) {
-        val url = "$BASE_URL?userId=$userId"
+        val url = "$BASE_URL/orders/filter?userId=$userId"
         val request = Request.Builder().url(url).get().build()
 
         client.newCall(request).enqueue(object : Callback {
