@@ -95,8 +95,19 @@ class OrderDetailActivity : AppCompatActivity() {
 
         // Items summary đơn giản
         val itemsText = buildString {
-            val sdf = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
-            append("Thời gian: ${sdf.format(Date(order.orderDate))}\n\n")
+            // order.orderDate là chuỗi ISO: 2025-12-03T08:19:08.423Z
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val outputFormat = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
+
+            val dateText = try {
+                val d = inputFormat.parse(order.orderDate)
+                if (d != null) outputFormat.format(d) else "-"
+            } catch (e: Exception) {
+                "-"
+            }
+
+            append("Thời gian: $dateText\n\n")
             order.items.forEach { item ->
                 append("- ${item.productName} x${item.quantity} (${formatter.format(item.finalUnitPrice)})\n")
             }
