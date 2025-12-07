@@ -18,7 +18,7 @@
             android:text="Order ID"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="@color/black" />
+            android:textColor="@color/dark_brown" />
 
         <TextView
             android:id="@+id/tvOrderStatusDetail"
@@ -26,7 +26,8 @@
             android:layout_height="wrap_content"
             android:text="Status"
             android:textSize="14sp"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="4dp"
+            android:textColor="@color/dark_brown" />
 
         <TextView
             android:id="@+id/tvOrderTotalDetail"
@@ -35,7 +36,8 @@
             android:text="Total"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:textColor="@color/dark_brown" />
 
         <!-- Chọn hình thức nhận -->
         <TextView
@@ -43,7 +45,8 @@
             android:layout_height="wrap_content"
             android:text="Delivery method"
             android:textStyle="bold"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:textColor="@color/dark_brown" />
 
         <RadioGroup
             android:id="@+id/rgDeliveryMethod"
@@ -55,13 +58,15 @@
                 android:id="@+id/rbPickup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nhận tại quán" />
+                android:text="Nhận tại quán"
+                android:textColor="@color/dark_brown" />
 
             <RadioButton
                 android:id="@+id/rbCod"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="COD (+15.000đ)" />
+                android:text="COD (+15.000đ)"
+                android:textColor="@color/dark_brown" />
         </RadioGroup>
 
         <!-- Form địa chỉ cho COD -->
@@ -77,38 +82,50 @@
                 android:id="@+id/etFullName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Họ tên" />
+                android:hint="Họ tên"
+                android:textColor="@color/dark_brown"
+                android:textColorHint="@color/dark_brown" />
 
             <EditText
                 android:id="@+id/etPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Số điện thoại"
-                android:inputType="phone" />
+                android:inputType="phone"
+                android:textColor="@color/dark_brown"
+                android:textColorHint="@color/dark_brown" />
 
             <EditText
                 android:id="@+id/etStreet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Địa chỉ (đường, số nhà)" />
+                android:hint="Địa chỉ (đường, số nhà)"
+                android:textColor="@color/dark_brown"
+                android:textColorHint="@color/dark_brown" />
 
             <EditText
                 android:id="@+id/etWard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Phường/xã" />
+                android:hint="Phường/xã"
+                android:textColor="@color/dark_brown"
+                android:textColorHint="@color/dark_brown" />
 
             <EditText
                 android:id="@+id/etDistrict"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Quận/huyện" />
+                android:hint="Quận/huyện"
+                android:textColor="@color/dark_brown"
+                android:textColorHint="@color/dark_brown" />
 
             <EditText
                 android:id="@+id/etCity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Thành phố" />
+                android:hint="Thành phố"
+                android:textColor="@color/dark_brown"
+                android:textColorHint="@color/dark_brown" />
         </LinearLayout>
 
         <!-- Danh sách món trong đơn (tạm là TextView tổng hợp) -->
@@ -117,7 +134,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Items"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:textColor="@color/dark_brown" />
 
         <!-- Nút hành động -->
         <LinearLayout
@@ -131,14 +149,16 @@
                 android:id="@+id/btnCancelOrder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hủy đơn" />
+                android:text="Hủy đơn"
+                android:textColor="@color/dark_brown" />
 
             <Button
                 android:id="@+id/btnConfirmOrder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Xác nhận"
-                android:layout_marginStart="12dp" />
+                android:layout_marginStart="12dp"
+                android:textColor="@color/dark_brown" />
         </LinearLayout>
 
     </LinearLayout>

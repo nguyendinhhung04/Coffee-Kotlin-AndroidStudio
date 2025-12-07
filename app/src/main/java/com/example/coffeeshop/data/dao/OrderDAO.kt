@@ -110,7 +110,7 @@ object OrderDAO {
         callback: (success: Boolean, message: String, order: Order?) -> Unit
     ) {
         val request = Request.Builder()
-            .url("$BASE_URL/$orderId")
+            .url("$BASE_URL/orders/$orderId")
             .get()
             .build()
 
