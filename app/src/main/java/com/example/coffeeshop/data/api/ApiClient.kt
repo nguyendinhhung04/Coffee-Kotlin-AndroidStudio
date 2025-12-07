@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "https://c76lgf-3000.csb.app/"
+    private const val BASE_URL = "https://coffeeshop-mobileappproject-backend.onrender.com"
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
@@ -21,5 +21,9 @@ object ApiClient {
     // OrderApi mới – CHÚ Ý tên biến là orderApi
     val orderApi: OrderApi by lazy {
         retrofit.create(OrderApi::class.java)
+    }
+
+    val fcmApi: FcmApi by lazy {
+        retrofit.create(FcmApi::class.java)
     }
 }

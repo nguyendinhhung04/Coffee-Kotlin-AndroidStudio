@@ -1,12 +1,20 @@
 package com.example.coffeeshop.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coffeeshop.R
+import com.example.coffeeshop.data.api.ApiClient
+import com.example.coffeeshop.data.models.FcmTokenRequest
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.content.Intent
 import com.example.coffeeshop.utils.UserSessionManager
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +43,9 @@ class MainActivity : AppCompatActivity() {
         loadUserInfo()
 
         setupBottomNavigation()
+
+        // Save FCM token
+        sessionManager.getUserId()?.let { saveFcmToken(it) }
     }
 
     private fun loadUserInfo() {
@@ -74,6 +85,33 @@ class MainActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    private fun saveFcmToken(userId: String) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            val deviceToken = task.result
+            Log.d("FCM", "FCM Token: $deviceToken")
+
+            val request = FcmTokenRequest(userId = userId, deviceToken = deviceToken)
+            ApiClient.fcmApi.saveToken(request).enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        Log.d("FCM", "Token saved successfully")
+                    } else {
+                        Log.e("FCM", "Failed to save token: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Log.e("FCM", "Failed to save token", t)
+                }
+            })
+        }
     }
 
     // Nếu bạn có menu logout hoặc nút logout

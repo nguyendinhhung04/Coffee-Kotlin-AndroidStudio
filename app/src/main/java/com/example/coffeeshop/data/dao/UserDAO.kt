@@ -8,7 +8,7 @@ import java.io.IOException
 object UserDAO {
     private val client = OkHttpClient()
     // Make sure this matches your backend URL
-    private const val BASE_URL = "https://c76lgf-3000.csb.app"
+    private const val BASE_URL = "https://coffeeshop-mobileappproject-backend.onrender.com"
     private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
 
     /**

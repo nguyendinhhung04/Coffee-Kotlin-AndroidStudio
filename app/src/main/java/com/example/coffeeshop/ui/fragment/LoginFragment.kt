@@ -78,7 +78,6 @@ class LoginFragment : Fragment() {
                                     phone = user.optString("phone", ""),
                                     token = token
                                 )
-
                                 Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                                 navigateToMain()
                             } else {
