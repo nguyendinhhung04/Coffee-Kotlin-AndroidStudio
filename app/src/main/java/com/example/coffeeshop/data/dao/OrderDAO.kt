@@ -182,7 +182,7 @@ object OrderDAO {
 
         val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
         val request = Request.Builder()
-            .url("$BASE_URL/$orderId")
+            .url("$BASE_URL/orders/$orderId")
             .put(body)
             .build()
 

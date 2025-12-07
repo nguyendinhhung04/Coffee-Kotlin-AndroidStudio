@@ -130,6 +130,16 @@ class OrderDetailActivity : AppCompatActivity() {
             rbPickup.isChecked = true
             layoutAddress.visibility = View.GONE
         }
+
+        // Ẩn/hiện nút hủy theo trạng thái
+        val blocked = listOf("Confirmed", "Delivering", "Delivered")
+        if (blocked.contains(order.status)) {
+            btnCancelOrder.visibility = View.GONE
+            btnConfirmOrder.visibility = View.GONE
+        } else {
+            btnCancelOrder.visibility = View.VISIBLE
+            btnConfirmOrder.visibility = View.VISIBLE
+        }
     }
 
     private fun setupListeners() {
@@ -143,14 +153,24 @@ class OrderDetailActivity : AppCompatActivity() {
 
         btnCancelOrder.setOnClickListener {
             val order = currentOrder ?: return@setOnClickListener
-            val orderId = order._id ?: return@setOnClickListener
 
+            // Không cho hủy nếu đã Confirmed / Delivering / Delivered
+            val blocked = listOf("Confirmed", "Delivering", "Delivered")
+            if (blocked.contains(order.status)) {
+                Toast.makeText(
+                    this,
+                    "Đơn đã ở trạng thái ${order.status}, không thể hủy.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            val orderId = order._id ?: return@setOnClickListener
             OrderDAO.cancelOrder(orderId) { success, message ->
                 runOnUiThread {
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                     if (success) {
                         tvOrderStatus.text = "Status: Cancel"
-                        // Có thể finish() hoặc quay lại màn YourOrder nếu muốn
                         finish()
                     }
                 }
@@ -197,6 +217,7 @@ class OrderDetailActivity : AppCompatActivity() {
                     }
                 }
             }
+            finish()
         }
     }
 }
