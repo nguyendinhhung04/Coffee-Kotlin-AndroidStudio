@@ -1,12 +1,24 @@
 package com.example.coffeeshop.ui.activity
 
-import android.os.Bundle
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import com.example.coffeeshop.R
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.example.coffeeshop.R
+import com.example.coffeeshop.data.api.ApiClient
+import com.example.coffeeshop.data.models.FcmTokenRequest
 import com.example.coffeeshop.utils.UserSessionManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.messaging.FirebaseMessaging
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,13 +26,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvGreeting: TextView
     private lateinit var bottomNavigationView: BottomNavigationView
 
+    // Trình khởi chạy cho yêu cầu quyền
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Quyền đã được cấp. Bây giờ bạn có thể lưu token.
+            Log.d("Permission", "POST_NOTIFICATIONS permission granted.")
+            sessionManager.getUserId()?.let { saveFcmToken(it) }
+        } else {
+            // Giải thích cho người dùng rằng thông báo đã bị tắt.
+            Log.w("Permission", "POST_NOTIFICATIONS permission denied.")
+            // Bạn có thể muốn hiển thị một hộp thoại hoặc snackbar ở đây.
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize session manager
+        // Khởi tạo trình quản lý phiên
         sessionManager = UserSessionManager(this)
 
-        // Kiểm tra login status
+        // Kiểm tra trạng thái đăng nhập
         if (!sessionManager.isLoggedIn()) {
             navigateToLogin()
             return
@@ -31,14 +58,41 @@ class MainActivity : AppCompatActivity() {
         tvGreeting = findViewById(R.id.tvGreeting)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
 
-        // Load user info from session
+        // Tải thông tin người dùng từ phiên
         loadUserInfo()
 
         setupBottomNavigation()
+
+        // Yêu cầu quyền gửi thông báo và sau đó lưu token FCM
+        askNotificationPermission()
     }
 
+    private fun askNotificationPermission() {
+        // Điều này chỉ cần thiết cho API cấp 33 (TIRAMISU) trở lên
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // SDK FCM (và ứng dụng của bạn) có thể đăng thông báo.
+                Log.d("Permission", "POST_NOTIFICATIONS permission already granted.")
+                sessionManager.getUserId()?.let { saveFcmToken(it) }
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                // TODO: Hiển thị giao diện người dùng giải thích lý do tại sao quyền là cần thiết
+                // Trong ví dụ này, chúng tôi sẽ chỉ yêu cầu quyền
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                // Yêu cầu quyền trực tiếp
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            // Đối với các phiên bản cũ hơn, quyền được cấp theo mặc định
+            sessionManager.getUserId()?.let { saveFcmToken(it) }
+        }
+    }
+
+
     private fun loadUserInfo() {
-        // Lấy tên user từ session
+        // Lấy tên người dùng từ phiên
         val displayName = sessionManager.getDisplayName()
         tvGreeting.text = "Good day, $displayName"
     }
@@ -47,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
-                    // Already on Home
+                    // Đã ở trang chủ
                     true
                 }
                 R.id.navigation_drink_menu -> {
@@ -76,7 +130,34 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
-    // Nếu bạn có menu logout hoặc nút logout
+    private fun saveFcmToken(userId: String) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            val deviceToken = task.result
+            Log.d("FCM", "FCM Token: $deviceToken")
+
+            val request = FcmTokenRequest(userId = userId, deviceToken = deviceToken)
+            ApiClient.fcmApi.saveToken(request).enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        Log.d("FCM", "Token saved successfully")
+                    } else {
+                        Log.e("FCM", "Failed to save token: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Log.e("FCM", "Failed to save token", t)
+                }
+            })
+        }
+    }
+
+    // Nếu bạn có menu đăng xuất hoặc nút đăng xuất
     fun logout() {
         sessionManager.clearSession()
         navigateToLogin()

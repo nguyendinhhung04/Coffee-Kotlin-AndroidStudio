@@ -2,7 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Quyền truy cập Internet (đã có) -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+      THÊM VÀO: Quyền hiển thị thông báo, bắt buộc cho Android 13 (API 33) trở lên.
+      Việc này sẽ giải quyết cảnh báo "Call requires permission" trong PushNotificationService.
+    -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:usesCleartextTraffic="true"
@@ -18,19 +25,17 @@
         <activity
             android:name=".ui.activity.LoginActivity"
             android:exported="true">
-            <!-- DI CHUYỂN INTENT-FILTER VÀO ĐÂY -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Xóa intent-filter khỏi MainActivity và đặt exported="false" -->
+        <!-- Các activity khác -->
         <activity
             android:name=".ui.activity.MainActivity"
             android:exported="false" />
 
-        <!-- Các activity khác -->
         <activity
             android:name=".ui.activity.DrinkMenuActivity"
             android:exported="false" />
@@ -39,12 +44,23 @@
             android:name=".ui.activity.YourOrderActivity"
             android:exported="false" />
 
-        <activity android:name=".ui.activity.OrderDetailActivity" />
+        <!-- LƯU Ý: Thêm exported="false" nếu activity này không cần được gọi từ bên ngoài app -->
+        <activity
+            android:name=".ui.activity.OrderDetailActivity"
+            android:exported="false" />
 
         <activity
             android:name=".ui.activity.FavoritesActivity"
             android:exported="false" />
 
+        <!-- Cấu hình service cho Firebase Cloud Messaging (đã đúng) -->
+        <service
+            android:name=".services.PushNotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
     </application>
 

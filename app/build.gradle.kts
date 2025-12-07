@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("org.jetbrains.kotlin.kapt")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -68,4 +69,9 @@ dependencies {
     // SỬA: Dùng cú pháp Kotlin DSL với dấu ngoặc kép
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.cardview:cardview:1.0.0")
+
+    // THÊM: Firebase dependencies
+    // Import Firebase BOM để quản lý versions
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)   // Cloud Messaging
 }
