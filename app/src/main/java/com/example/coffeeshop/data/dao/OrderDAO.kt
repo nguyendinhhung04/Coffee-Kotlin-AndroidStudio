@@ -271,7 +271,7 @@ object OrderDAO {
         return Order(
             _id = obj.optString("_id"),
             userId = obj.optString("userId"),
-            orderDate = obj.optLong("orderDate"),
+            orderDate = obj.optString("orderDate"),
             status = obj.optString("status"),
             paymentMethod = obj.optString("paymentMethod"),
             note = obj.optString("note"),
@@ -291,7 +291,7 @@ object OrderDAO {
             Order(
                 _id = "65b0e50f55e3a3c9e6d0a001",
                 userId = "65b0e50f55e3a3c9e6d0a7a2",
-                orderDate = 1705662300000,
+                orderDate = "1705662300000",
                 status = "Delivered",
                 paymentMethod = "COD",
                 note = "Giao hàng cẩn thận, không làm đổ.",
@@ -338,7 +338,7 @@ object OrderDAO {
             Order(
                 _id = "65b0e50f55e3a3c9e6d0a002",
                 userId = "65b0e50f55e3a3c9e6d0a7a3",
-                orderDate = 1709277000000,
+                orderDate = "1709277000000",
                 status = "Confirmed",
                 paymentMethod = "COD",
                 note = "Gọi điện trước khi giao hàng.",
@@ -373,7 +373,7 @@ object OrderDAO {
             Order(
                 _id = "65b0e50f55e3a3c9e6d0a003",
                 userId = "65b0e50f55e3a3c9e6d0a7a4",
-                orderDate = 1712800800000,
+                orderDate = "1712800800000",
                 status = "Delivering",
                 paymentMethod = "COD",
                 note = "Không cần ghi chú gì thêm.",

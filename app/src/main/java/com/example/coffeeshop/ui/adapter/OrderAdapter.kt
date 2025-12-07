@@ -45,7 +45,22 @@ class  OrderAdapter(
 
         // Date
         val sdf = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
-        holder.tvOrderDate.text = sdf.format(Date(order.orderDate))
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        val outputFormat = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
+
+        val date = try {
+            inputFormat.parse(order.orderDate)
+        } catch (e: Exception) {
+            null
+        }
+
+        holder.tvOrderDate.text = if (date != null) {
+            outputFormat.format(date)
+        } else {
+            "-"
+        }
 
         // Status
         holder.tvOrderStatus.text = order.status

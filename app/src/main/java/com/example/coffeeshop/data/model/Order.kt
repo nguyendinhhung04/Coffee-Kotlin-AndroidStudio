@@ -30,7 +30,7 @@ data class OrderItem(
 data class Order(
     val _id: String? = null,
     val userId: String,
-    val orderDate: Long, // Timestamp (ms)
+    val orderDate: String,// Timestamp (ms)
     val status: String, // "Pending", "Confirmed", "Delivering", "Delivered", "Cancelled"
     val paymentMethod: String, // "COD", "Transfer", "Card"
     val note: String,
