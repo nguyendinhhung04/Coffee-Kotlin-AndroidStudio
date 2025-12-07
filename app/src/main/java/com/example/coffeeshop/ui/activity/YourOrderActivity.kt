@@ -48,6 +48,11 @@ class YourOrderActivity : AppCompatActivity() {
         loadOrdersFromServer()
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadOrdersFromServer()
+    }
+
     private fun setupRecyclerView() {
         orderAdapter = OrderAdapter(emptyList()) { order ->
             val intent = Intent(this, OrderDetailActivity::class.java)
@@ -141,7 +146,7 @@ class YourOrderActivity : AppCompatActivity() {
     private fun applyFilterAndShow() {
         val filtered = if (showingRecently) {
             // Recently: Pending, Confirmed, Delivering
-            allOrders.filter { it.status != "Delivered" }
+            allOrders.filter { it.status != "Delivered" && it.status != "Cancelled"}
         } else {
             // Past: Delivered
             allOrders.filter { it.status == "Delivered" }

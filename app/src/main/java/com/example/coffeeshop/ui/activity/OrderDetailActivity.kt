@@ -132,13 +132,15 @@ class OrderDetailActivity : AppCompatActivity() {
 
         btnCancelOrder.setOnClickListener {
             val order = currentOrder ?: return@setOnClickListener
-            // Status -> Cancel
             val orderId = order._id ?: return@setOnClickListener
-            OrderDAO.updateOrderStatus(orderId, "Cancel") { success, message ->
+
+            OrderDAO.cancelOrder(orderId) { success, message ->
                 runOnUiThread {
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                     if (success) {
                         tvOrderStatus.text = "Status: Cancel"
+                        // Có thể finish() hoặc quay lại màn YourOrder nếu muốn
+                        finish()
                     }
                 }
             }

@@ -206,8 +206,10 @@ object OrderDAO {
         orderId: String,
         callback: (success: Boolean, message: String) -> Unit
     ) {
+        val url = "$BASE_URL/orders/$orderId"
+
         val request = Request.Builder()
-            .url("$BASE_URL/$orderId")
+            .url(url)
             .delete()
             .build()
 
