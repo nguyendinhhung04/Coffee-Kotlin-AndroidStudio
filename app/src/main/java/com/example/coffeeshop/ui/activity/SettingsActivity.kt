@@ -67,8 +67,8 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         layoutChangePassword.setOnClickListener {
-            // TODO: open ChangePasswordActivity, for now just a Toast
-            Toast.makeText(this, "Change password coming soon", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, ChangePasswordActivity::class.java)
+            startActivity(intent)
         }
 
         btnLogout.setOnClickListener {

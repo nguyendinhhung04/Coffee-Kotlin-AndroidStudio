@@ -58,7 +58,8 @@ class LoginFragment : Fragment() {
                     fullName = username.capitalize(),
                     email = "$username@coffee.com",
                     phone = "",
-                    token = "hardcoded_token"
+                    token = "hardcoded_token",
+                    password = password
                 )
 
                 Toast.makeText(requireContext(), "Login successful (Hardcoded)!", Toast.LENGTH_SHORT).show()
@@ -76,7 +77,8 @@ class LoginFragment : Fragment() {
                                     fullName = user.optString("fullName", ""),
                                     email = user.optString("email", ""),
                                     phone = user.optString("phone", ""),
-                                    token = token
+                                    token = token,
+                                    password = password
                                 )
                                 Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                                 navigateToMain()

@@ -17,6 +17,9 @@ class UserSessionManager(context: Context) {
         private const val KEY_EMAIL = "email"
         private const val KEY_PHONE = "phone"
         private const val KEY_TOKEN = "token"
+
+        private const val KEY_PASSWORD = "password"
+
     }
 
     // Save session
@@ -26,7 +29,8 @@ class UserSessionManager(context: Context) {
         fullName: String?,
         email: String?,
         phone: String?,
-        token: String?
+        token: String?,
+        password: String?
     ) {
         prefs.edit().apply {
             putBoolean(KEY_IS_LOGGED_IN, true)
@@ -36,6 +40,7 @@ class UserSessionManager(context: Context) {
             putString(KEY_EMAIL, email)
             putString(KEY_PHONE, phone)
             putString(KEY_TOKEN, token)
+            putString(KEY_PASSWORD, password)
             apply()
         }
     }
@@ -87,5 +92,11 @@ class UserSessionManager(context: Context) {
 
     fun setPhone(phone: String) {
         prefs.edit().putString(KEY_PHONE, phone).apply()
+    }
+
+    fun getPassword(): String? = prefs.getString(KEY_PASSWORD, null)
+
+    fun setPassword(newPassword: String) {
+        prefs.edit().putString(KEY_PASSWORD, newPassword).apply()
     }
 }

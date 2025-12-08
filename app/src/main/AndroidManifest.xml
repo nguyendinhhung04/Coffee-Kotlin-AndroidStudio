@@ -55,6 +55,7 @@
 
         <activity android:name=".ui.activity.SettingsActivity" />
         <activity android:name=".ui.activity.EditProfileActivity" />
+        <activity android:name=".ui.activity.ChangePasswordActivity" />
 
 
         <!-- Cấu hình service cho Firebase Cloud Messaging (đã đúng) -->

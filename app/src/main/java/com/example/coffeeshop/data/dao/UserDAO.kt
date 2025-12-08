@@ -104,6 +104,43 @@ object UserDAO {
         })
     }
 
+    fun changePassword(
+        userId: String,
+        newPassword: String,
+        callback: (success: Boolean, message: String) -> Unit
+    ) {
+        val json = JSONObject().apply {
+            put("password", newPassword)
+        }
+
+        val body = RequestBody.create(JSON_MEDIA_TYPE, json.toString())
+
+        val request = Request.Builder()
+            .url("$BASE_URL/users/$userId")
+            .put(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false, "Network error: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyStr = response.body?.string()
+                if (response.isSuccessful) {
+                    callback(true, "Password updated")
+                } else {
+                    val errorMsg = try {
+                        JSONObject(bodyStr ?: "").optString("message", "Change password failed")
+                    } catch (e: Exception) {
+                        "Change password failed: ${response.code}"
+                    }
+                    callback(false, errorMsg)
+                }
+            }
+        })
+    }
+
     /**
      * Register Function
      * Updates:
