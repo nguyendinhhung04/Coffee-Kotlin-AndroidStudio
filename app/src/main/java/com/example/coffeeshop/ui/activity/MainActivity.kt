@@ -19,12 +19,16 @@ import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
+import android.widget.ImageView
+import com.example.coffeeshop.ui.activity.SettingsActivity
 class MainActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: UserSessionManager
     private lateinit var tvGreeting: TextView
     private lateinit var bottomNavigationView: BottomNavigationView
+
+    private lateinit var ivMenu: ImageView
+
 
     // Trình khởi chạy cho yêu cầu quyền
     private val requestPermissionLauncher = registerForActivityResult(
@@ -44,10 +48,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Khởi tạo trình quản lý phiên
         sessionManager = UserSessionManager(this)
 
-        // Kiểm tra trạng thái đăng nhập
         if (!sessionManager.isLoggedIn()) {
             navigateToLogin()
             return
@@ -57,13 +59,15 @@ class MainActivity : AppCompatActivity() {
 
         tvGreeting = findViewById(R.id.tvGreeting)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
+        ivMenu = findViewById(R.id.ivMenu)   // <-- use ivMenu from XML
 
-        // Tải thông tin người dùng từ phiên
+        ivMenu.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
         loadUserInfo()
-
         setupBottomNavigation()
-
-        // Yêu cầu quyền gửi thông báo và sau đó lưu token FCM
         askNotificationPermission()
     }
 

@@ -53,6 +53,9 @@
             android:name=".ui.activity.FavoritesActivity"
             android:exported="false" />
 
+        <activity android:name=".ui.activity.SettingsActivity" />
+
+
         <!-- Cấu hình service cho Firebase Cloud Messaging (đã đúng) -->
         <service
             android:name=".services.PushNotificationService"

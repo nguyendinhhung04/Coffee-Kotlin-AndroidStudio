@@ -15,6 +15,8 @@ import com.example.coffeeshop.data.model.Order
 import com.example.coffeeshop.utils.UserSessionManager
 import com.example.coffeeshop.ui.adapter.OrderAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.widget.ImageView
+import com.example.coffeeshop.ui.activity.SettingsActivity
 
 class YourOrderActivity : AppCompatActivity() {
 
@@ -29,6 +31,9 @@ class YourOrderActivity : AppCompatActivity() {
     private var allOrders: List<Order> = emptyList()
     private var showingRecently: Boolean = true
 
+    private lateinit var ivMenu: ImageView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_your_order)
@@ -42,6 +47,13 @@ class YourOrderActivity : AppCompatActivity() {
         setupBottomNavigationView()
         setupRecyclerView()
         setupOrderFilterButtons()
+
+        ivMenu = findViewById(R.id.ivYourOrdersMenu)
+
+        ivMenu.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
 
         // Mặc định: Recently
         btnRecently.performClick()

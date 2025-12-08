@@ -19,6 +19,8 @@ import com.example.coffeeshop.ui.fragment.CartBottomSheetFragment
 import com.example.coffeeshop.utils.CartManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import android.widget.ImageView
+import com.example.coffeeshop.ui.activity.SettingsActivity
 
 class DrinkMenuActivity : AppCompatActivity() {
 
@@ -31,6 +33,11 @@ class DrinkMenuActivity : AppCompatActivity() {
     private lateinit var tvEmptyMessage: TextView
     private lateinit var tvCartBadge: TextView
     private lateinit var fabCart: FloatingActionButton
+
+    private lateinit var ivMenu: ImageView
+
+
+
 
     // Adapter for menu list = Item
     private lateinit var drinkAdapter: DrinkItemAdapter
@@ -45,6 +52,13 @@ class DrinkMenuActivity : AppCompatActivity() {
         setupFilterButtons()
         setupRecyclerView()
         setupCartButton()
+
+        ivMenu = findViewById(R.id.ivDrinkMenuMenu)
+
+        ivMenu.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
 
         loadItemsByCategory("coffee")
     }

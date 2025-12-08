@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF9F1"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvSettingsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_brown" />
+
+        <!-- Account section -->
+        <TextView
+            android:id="@+id/tvAccountSectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Account"
+            android:textStyle="bold"
+            android:textColor="@color/dark_brown"
+            android:layout_marginTop="24dp" />
+
+        <!-- Profile info card -->
+        <LinearLayout
+            android:id="@+id/layoutProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:background="@drawable/bg_card_light"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tvProfileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textStyle="bold"
+                android:textColor="@color/dark_brown" />
+
+            <TextView
+                android:id="@+id/tvProfileEmailOrPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email / Phone"
+                android:textColor="@color/dark_brown"
+                android:layout_marginTop="4dp" />
+
+            <Button
+                android:id="@+id/btnEditProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit profile"
+                android:textColor="@color/dark_brown"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- Security section -->
+        <TextView
+            android:id="@+id/tvSecuritySectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Security"
+            android:textStyle="bold"
+            android:textColor="@color/dark_brown"
+            android:layout_marginTop="24dp" />
+
+        <LinearLayout
+            android:id="@+id/layoutChangePassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="8dp"
+            android:background="@drawable/bg_card_light"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Change password"
+                android:textColor="@color/dark_brown" />
+        </LinearLayout>
+
+        <!-- Logout -->
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Log out"
+            android:textAllCaps="false"
+            android:layout_marginTop="32dp"
+            android:backgroundTint="@color/brown"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+</ScrollView>

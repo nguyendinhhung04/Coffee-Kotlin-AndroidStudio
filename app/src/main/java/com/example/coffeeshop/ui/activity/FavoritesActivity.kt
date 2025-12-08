@@ -6,10 +6,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coffeeshop.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.widget.ImageView
+
 
 class FavoritesActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var ivMenu: ImageView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
