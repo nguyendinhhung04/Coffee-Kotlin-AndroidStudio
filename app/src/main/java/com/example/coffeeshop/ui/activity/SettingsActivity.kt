@@ -31,6 +31,11 @@ class SettingsActivity : AppCompatActivity() {
         setupListeners()
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadUserInfo()  // cập nhật lại tên/email/phone sau khi EditProfileActivity lưu xong
+    }
+
     private fun initViews() {
         tvProfileName = findViewById(R.id.tvProfileName)
         tvProfileEmailOrPhone = findViewById(R.id.tvProfileEmailOrPhone)
@@ -57,8 +62,8 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         btnEditProfile.setOnClickListener {
-            // TODO: open a real EditProfileActivity or fragment
-            Toast.makeText(this, "Edit profile coming soon", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, EditProfileActivity::class.java)
+            startActivity(intent)
         }
 
         layoutChangePassword.setOnClickListener {

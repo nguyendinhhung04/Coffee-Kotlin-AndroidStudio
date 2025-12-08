@@ -71,6 +71,11 @@ class MainActivity : AppCompatActivity() {
         askNotificationPermission()
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadUserInfo()  // đọc lại từ UserSessionManager mỗi lần quay về màn chính
+    }
+
     private fun askNotificationPermission() {
         // Điều này chỉ cần thiết cho API cấp 33 (TIRAMISU) trở lên
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

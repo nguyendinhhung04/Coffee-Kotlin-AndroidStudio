@@ -5,7 +5,8 @@ import android.content.SharedPreferences
 
 class UserSessionManager(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences =
+        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
     companion object {
         private const val PREF_NAME = "CoffeeShopUserSession"
@@ -18,9 +19,7 @@ class UserSessionManager(context: Context) {
         private const val KEY_TOKEN = "token"
     }
 
-    /**
-     * Lưu thông tin user sau khi đăng nhập thành công
-     */
+    // Save session
     fun saveUserSession(
         userId: String,
         username: String,
@@ -41,65 +40,31 @@ class UserSessionManager(context: Context) {
         }
     }
 
-    /**
-     * Kiểm tra user đã đăng nhập chưa
-     */
-    fun isLoggedIn(): Boolean {
-        return prefs.getBoolean(KEY_IS_LOGGED_IN, false)
-    }
+    fun isLoggedIn(): Boolean =
+        prefs.getBoolean(KEY_IS_LOGGED_IN, false)
 
-    /**
-     * Lấy User ID
-     */
-    fun getUserId(): String? {
-        return prefs.getString(KEY_USER_ID, null)
-    }
+    fun getUserId(): String? =
+        prefs.getString(KEY_USER_ID, null)
 
-    /**
-     * Lấy Username
-     */
-    fun getUsername(): String? {
-        return prefs.getString(KEY_USERNAME, null)
-    }
+    fun getUsername(): String? =
+        prefs.getString(KEY_USERNAME, null)
 
-    /**
-     * Lấy Full Name
-     */
-    fun getFullName(): String? {
-        return prefs.getString(KEY_FULL_NAME, null)
-    }
+    fun getFullName(): String? =
+        prefs.getString(KEY_FULL_NAME, null)
 
-    /**
-     * Lấy Email
-     */
-    fun getEmail(): String? {
-        return prefs.getString(KEY_EMAIL, null)
-    }
+    fun getEmail(): String? =
+        prefs.getString(KEY_EMAIL, null)
 
-    /**
-     * Lấy Phone
-     */
-    fun getPhone(): String? {
-        return prefs.getString(KEY_PHONE, null)
-    }
+    fun getPhone(): String? =
+        prefs.getString(KEY_PHONE, null)
 
-    /**
-     * Lấy Token
-     */
-    fun getToken(): String? {
-        return prefs.getString(KEY_TOKEN, null)
-    }
+    fun getToken(): String? =
+        prefs.getString(KEY_TOKEN, null)
 
-    /**
-     * Xóa session khi logout
-     */
     fun clearSession() {
         prefs.edit().clear().apply()
     }
 
-    /**
-     * Lấy display name (ưu tiên fullName, fallback về username)
-     */
     fun getDisplayName(): String {
         val fullName = getFullName()
         val username = getUsername()
@@ -108,5 +73,19 @@ class UserSessionManager(context: Context) {
             !username.isNullOrEmpty() -> username
             else -> "User"
         }
+    }
+
+    // NEW: setters for EditProfileActivity
+
+    fun setFullName(fullName: String) {
+        prefs.edit().putString(KEY_FULL_NAME, fullName).apply()
+    }
+
+    fun setEmail(email: String) {
+        prefs.edit().putString(KEY_EMAIL, email).apply()
+    }
+
+    fun setPhone(phone: String) {
+        prefs.edit().putString(KEY_PHONE, phone).apply()
     }
 }

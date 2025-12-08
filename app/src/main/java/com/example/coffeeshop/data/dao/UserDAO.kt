@@ -62,6 +62,48 @@ object UserDAO {
         })
     }
 
+    fun updateUser(
+        userId: String,
+        fullName: String,
+        email: String,
+        phone: String,
+        callback: (success: Boolean, message: String) -> Unit
+    ) {
+        val json = JSONObject().apply {
+            put("fullName", fullName)
+            put("email", email)
+            put("phone", phone)
+            // Do NOT put username because API says it cannot be changed
+        }
+
+        val body = RequestBody.create(JSON_MEDIA_TYPE, json.toString())
+
+        val request = Request.Builder()
+            .url("$BASE_URL/users/$userId")
+            .put(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false, "Network error: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyStr = response.body?.string()
+                if (response.isSuccessful) {
+                    callback(true, "Profile updated")
+                } else {
+                    val errorMsg = try {
+                        JSONObject(bodyStr ?: "").optString("message", "Update failed")
+                    } catch (e: Exception) {
+                        "Update failed: ${response.code}"
+                    }
+                    callback(false, errorMsg)
+                }
+            }
+        })
+    }
+
     /**
      * Register Function
      * Updates:
