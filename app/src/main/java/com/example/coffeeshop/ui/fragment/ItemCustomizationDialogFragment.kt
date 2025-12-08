@@ -67,14 +67,19 @@ class ItemCustomizationDialogFragment : DialogFragment() {
     }
 
     private fun setupSpinners() {
+        val ctx = requireContext()
+
         // Size
         if (item.sizes.isNotEmpty()) {
             val sizeLabels = item.sizes.map { it.label }
-            spSize.adapter = ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
+            val sizeAdapter = ArrayAdapter(
+                ctx,
+                R.layout.item_spinner_brown,      // dùng layout custom
                 sizeLabels
-            )
+            ).also {
+                it.setDropDownViewResource(R.layout.item_spinner_brown)
+            }
+            spSize.adapter = sizeAdapter
             spSize.visibility = View.VISIBLE
         } else {
             spSize.visibility = View.GONE
@@ -83,11 +88,14 @@ class ItemCustomizationDialogFragment : DialogFragment() {
         // Temperature
         if (item.tempOptions.isNotEmpty()) {
             val tempLabels = item.tempOptions.map { it.label }
-            spTemp.adapter = ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
+            val tempAdapter = ArrayAdapter(
+                ctx,
+                R.layout.item_spinner_brown,
                 tempLabels
-            )
+            ).also {
+                it.setDropDownViewResource(R.layout.item_spinner_brown)
+            }
+            spTemp.adapter = tempAdapter
             spTemp.visibility = View.VISIBLE
         } else {
             spTemp.visibility = View.GONE
@@ -95,11 +103,14 @@ class ItemCustomizationDialogFragment : DialogFragment() {
 
         // Ice level
         if (item.iceLevels.isNotEmpty()) {
-            spIceLevel.adapter = ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
+            val iceAdapter = ArrayAdapter(
+                ctx,
+                R.layout.item_spinner_brown,
                 item.iceLevels
-            )
+            ).also {
+                it.setDropDownViewResource(R.layout.item_spinner_brown)
+            }
+            spIceLevel.adapter = iceAdapter
             spIceLevel.visibility = View.VISIBLE
         } else {
             spIceLevel.visibility = View.GONE
@@ -107,16 +118,20 @@ class ItemCustomizationDialogFragment : DialogFragment() {
 
         // Sugar level
         if (item.sugarLevels.isNotEmpty()) {
-            spSugarLevel.adapter = ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
+            val sugarAdapter = ArrayAdapter(
+                ctx,
+                R.layout.item_spinner_brown,
                 item.sugarLevels
-            )
+            ).also {
+                it.setDropDownViewResource(R.layout.item_spinner_brown)
+            }
+            spSugarLevel.adapter = sugarAdapter
             spSugarLevel.visibility = View.VISIBLE
         } else {
             spSugarLevel.visibility = View.GONE
         }
     }
+
 
     private fun setupListeners() {
         btnAddToCart.setOnClickListener {

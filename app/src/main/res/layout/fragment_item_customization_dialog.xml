@@ -49,7 +49,8 @@
             android:id="@+id/spSize"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/dark_brown" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -64,7 +65,8 @@
             android:id="@+id/spTemp"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/brown" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -79,7 +81,8 @@
             android:id="@+id/spIceLevel"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/dark_brown" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -94,7 +97,8 @@
             android:id="@+id/spSugarLevel"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/dark_brown"/>
 
         <TextView
             android:layout_width="wrap_content"

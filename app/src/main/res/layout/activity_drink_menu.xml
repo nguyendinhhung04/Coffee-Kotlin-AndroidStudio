@@ -57,6 +57,7 @@
         android:drawablePadding="8dp"
         android:hint="Search.."
         android:padding="12dp"
+        android:textColor="@color/dark_brown"
         android:textColorHint="@android:color/darker_gray"
         app:layout_constraintTop_toBottomOf="@+id/tvDrinkMenuGreeting"
         app:layout_constraintStart_toStartOf="parent"
