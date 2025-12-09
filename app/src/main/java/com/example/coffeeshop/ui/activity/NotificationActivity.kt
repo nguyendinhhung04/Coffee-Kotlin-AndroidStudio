@@ -26,7 +26,7 @@ class NotificationActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Cài đặt Toolbar
-        setSupportActionBar(binding.toolbarNotification)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Khởi tạo Adapter với danh sách rỗng
