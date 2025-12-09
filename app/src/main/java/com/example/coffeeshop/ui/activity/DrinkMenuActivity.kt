@@ -2,6 +2,7 @@ package com.example.coffeeshop.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
@@ -20,7 +21,9 @@ import com.example.coffeeshop.utils.CartManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.widget.ImageView
+import com.example.coffeeshop.data.dao.FavoriteDAO
 import com.example.coffeeshop.ui.activity.SettingsActivity
+import com.example.coffeeshop.utils.UserSessionManager
 
 class DrinkMenuActivity : AppCompatActivity() {
 
@@ -36,6 +39,9 @@ class DrinkMenuActivity : AppCompatActivity() {
 
     private lateinit var ivMenu: ImageView
 
+    private lateinit var sessionManager: UserSessionManager
+    private val favoriteIds = mutableSetOf<String>()
+
 
 
 
@@ -46,6 +52,8 @@ class DrinkMenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_drink_menu)
+
+        sessionManager = UserSessionManager(this)
 
         initViews()
         setupBottomNavigationView()
@@ -76,14 +84,53 @@ class DrinkMenuActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        // DrinkItemAdapter works with List<Item> and one lambda
-        drinkAdapter = DrinkItemAdapter(emptyList()) { item ->
-            onItemAddClick(item)
-        }
+        drinkAdapter = DrinkItemAdapter(
+            emptyList(),
+            onAddClick = { item ->
+                onItemAddClick(item)
+            },
+            onFavoriteClick = { item ->
+                toggleFavorite(item)
+            },
+            favoriteIds = favoriteIds   // nếu adapter có param này, xem bước 3
+        )
 
         rvDrinkItems.apply {
             layoutManager = LinearLayoutManager(this@DrinkMenuActivity)
             adapter = drinkAdapter
+        }
+    }
+
+    private fun toggleFavorite(item: Item) {
+        val userId = sessionManager.getUserId()
+        val itemId = item._id
+
+        if (userId.isNullOrBlank() || itemId.isNullOrBlank()) {
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (favoriteIds.contains(itemId)) {
+            FavoriteDAO.removeFavorite(userId, itemId) { success, msg ->
+                runOnUiThread {
+                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                    if (success) {
+                        favoriteIds.remove(itemId)
+                        drinkAdapter.notifyDataSetChanged()
+                    }
+                }
+            }
+        } else {
+            FavoriteDAO.addFavorite(userId, itemId) { success, msg ->
+                runOnUiThread {
+                    Log.d("Fav", "addFavorite result success=$success, msg=$msg")
+                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                    if (success) {
+                        favoriteIds.add(itemId)
+                        drinkAdapter.notifyDataSetChanged()
+                    }
+                }
+            }
         }
     }
 

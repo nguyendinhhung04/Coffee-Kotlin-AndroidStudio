@@ -1,5 +1,6 @@
 package com.example.coffeeshop.data.dao
 
+import android.util.Log
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import org.json.JSONArray
@@ -9,6 +10,8 @@ import com.example.coffeeshop.data.model.Item
 import com.example.coffeeshop.data.model.Size
 import com.example.coffeeshop.data.model.TempOption
 import com.example.coffeeshop.data.model.Topping
+import okhttp3.RequestBody.Companion.toRequestBody
+
 object FavoriteDAO {
     private val client = OkHttpClient()
     private const val BASE_URL = "https://coffeeshop-mobileappproject-backend.onrender.com"
@@ -52,6 +55,81 @@ object FavoriteDAO {
         })
     }
 
+    fun addFavorite(
+        userId: String,
+        itemId: String,
+        callback: (Boolean, String) -> Unit
+    ) {
+        val json = JSONObject().apply {
+            put("userId", userId)
+            put("itemId", itemId)
+        }
+        Log.d("Fav", "addFavorite body=$json")
+
+        val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
+
+        val request = Request.Builder()
+            .url("$BASE_URL/favorites")
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false, "Network error: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyStr = response.body?.string()
+                if (response.isSuccessful) {
+                    callback(true, "Added to favorites")
+                } else {
+                    val msg = try {
+                        JSONObject(bodyStr ?: "").optString("message", "Add favorite failed")
+                    } catch (e: Exception) {
+                        "Add favorite failed: ${response.code}"
+                    }
+                    callback(false, msg)
+                }
+            }
+        })
+    }
+
+    fun removeFavorite(
+        userId: String,
+        itemId: String,
+        callback: (Boolean, String) -> Unit
+    ) {
+        val json = JSONObject().apply {
+            put("userId", userId)
+            put("itemId", itemId)
+        }
+        val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
+
+        val request = Request.Builder()
+            .url("$BASE_URL/favorites")
+            .delete(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false, "Network error: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyStr = response.body?.string()
+                if (response.isSuccessful) {
+                    callback(true, "Removed from favorites")
+                } else {
+                    val msg = try {
+                        JSONObject(bodyStr ?: "").optString("message", "Remove favorite failed")
+                    } catch (e: Exception) {
+                        "Remove favorite failed: ${response.code}"
+                    }
+                    callback(false, msg)
+                }
+            }
+        })
+    }
     private fun parseItem(obj: JSONObject): Item {
         // parse sizes
         val sizesJson = obj.optJSONArray("sizes")

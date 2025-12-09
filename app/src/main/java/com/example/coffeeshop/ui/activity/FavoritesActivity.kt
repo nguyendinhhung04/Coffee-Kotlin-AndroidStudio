@@ -34,6 +34,7 @@ class FavoritesActivity : AppCompatActivity() {
 
     private lateinit var tvFavoritesCartBadge: TextView
 
+    private val favoriteIds = mutableSetOf<String>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,18 +62,25 @@ class FavoritesActivity : AppCompatActivity() {
         rvFavorites = findViewById(R.id.rvFavorites)
         tvEmptyFavorites = findViewById(R.id.tvEmptyFavorites)
 
-        adapter = DrinkItemAdapter(emptyList()) { item ->
-            // Add to cart nhanh từ favorites
-            val cartItem = com.example.coffeeshop.data.model.CartItem(
-                item = item,
-                quantity = 1,
-                customizations = emptyMap(),
-                price = item.basePrice
-            )
-            CartManager.addItem(cartItem)
-            updateCartBadge()
-            Toast.makeText(this, "Added ${item.name} to cart", Toast.LENGTH_SHORT).show()
-        }
+        adapter = DrinkItemAdapter(
+            emptyList(),
+            onAddClick = { item ->
+                val cartItem = com.example.coffeeshop.data.model.CartItem(
+                    item = item,
+                    quantity = 1,
+                    customizations = emptyMap(),
+                    price = item.basePrice
+                )
+                CartManager.addItem(cartItem)
+                updateCartBadge()
+                Toast.makeText(this, "Added ${item.name} to cart", Toast.LENGTH_SHORT).show()
+            },
+            onFavoriteClick = { item ->
+                // ở Favorites có thể là removeFavorite rồi reload, hoặc tạm thời chỉ toast
+                Toast.makeText(this, "Favorite clicked: ${item.name}", Toast.LENGTH_SHORT).show()
+            },
+            favoriteIds = favoriteIds
+        )
 
         rvFavorites.layoutManager = LinearLayoutManager(this)
         rvFavorites.adapter = adapter

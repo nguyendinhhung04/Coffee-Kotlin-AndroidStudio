@@ -15,7 +15,9 @@ import java.util.*
 
 class DrinkItemAdapter(
     private var items: List<Item>,
-    private val onAddClick: (Item) -> Unit
+    private val onAddClick: (Item) -> Unit,
+    private val onFavoriteClick: (Item) -> Unit,
+    private val favoriteIds: MutableSet<String>
 ) : RecyclerView.Adapter<DrinkItemAdapter.DrinkViewHolder>() {
 
     inner class DrinkViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -24,6 +26,10 @@ class DrinkItemAdapter(
         val tvDescription: TextView = view.findViewById(R.id.tvDrinkItemDescription)
         val tvPrice: TextView = view.findViewById(R.id.tvDrinkItemPrice)
         val fabAdd: FloatingActionButton = view.findViewById(R.id.fabAddOrder)
+
+        val ivFavorite: ImageView = view.findViewById(R.id.ivFavorite)
+
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrinkViewHolder {
@@ -46,6 +52,11 @@ class DrinkItemAdapter(
         val context = holder.itemView.context
         val imageName = item.image_url
 
+        val isFav = item._id != null && favoriteIds.contains(item._id)
+        holder.ivFavorite.setImageResource(
+            if (isFav) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_border
+        )
+
         try {
             // Try to load from assets/item_img/
             val inputStream = context.assets.open("item_img/$imageName")
@@ -62,7 +73,20 @@ class DrinkItemAdapter(
         holder.fabAdd.setOnClickListener {
             onAddClick(item)
         }
-        holder.itemView.setOnClickListener { onAddClick(item) }
+
+        holder.ivFavorite.setOnClickListener {
+            onFavoriteClick(item)
+        }
+
+        holder.itemView.setOnClickListener {
+            onAddClick(item)   // hoặc nút add riêng nếu bạn có
+        }
+
+        fun updateItems(newItems: List<Item>) {
+            items = newItems
+            notifyDataSetChanged()
+        }
+
     }
 
     override fun getItemCount(): Int = items.size
