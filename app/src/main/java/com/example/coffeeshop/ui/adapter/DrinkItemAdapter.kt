@@ -44,7 +44,6 @@ class DrinkItemAdapter(
         holder.tvTitle.text = item.name
         holder.tvDescription.text = item.description
 
-        // Format price in VND
         val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
         holder.tvPrice.text = formatter.format(item.basePrice)
 
@@ -54,12 +53,13 @@ class DrinkItemAdapter(
 
         val isFav = item._id != null && favoriteIds.contains(item._id)
         holder.ivFavorite.setImageResource(
-            if (isFav) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_border
+            if (isFav) R.drawable.ic_favorite_filled
+            else R.drawable.ic_favorite_border
         )
 
-        holder.ivFavorite.setOnClickListener {
-            onFavoriteClick(item)
-        }
+        holder.ivFavorite.setOnClickListener { onFavoriteClick(item) }
+        holder.fabAdd.setOnClickListener { onAddClick(item) }
+        holder.itemView.setOnClickListener { onAddClick(item) }
 
         try {
             // Try to load from assets/item_img/
@@ -74,17 +74,6 @@ class DrinkItemAdapter(
             holder.ivImage.setImageResource(R.drawable.socola)
         }
 
-        holder.fabAdd.setOnClickListener {
-            onAddClick(item)
-        }
-
-        holder.ivFavorite.setOnClickListener {
-            onFavoriteClick(item)
-        }
-
-        holder.itemView.setOnClickListener {
-            onAddClick(item)   // hoặc nút add riêng nếu bạn có
-        }
 
         fun updateItems(newItems: List<Item>) {
             items = newItems
@@ -94,6 +83,8 @@ class DrinkItemAdapter(
     }
 
     override fun getItemCount(): Int = items.size
+    fun getItems(): List<Item> = items
+
 
     fun updateItems(newItems: List<Item>) {
         items = newItems

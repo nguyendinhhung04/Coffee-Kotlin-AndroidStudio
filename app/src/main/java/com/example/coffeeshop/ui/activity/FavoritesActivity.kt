@@ -76,14 +76,43 @@ class FavoritesActivity : AppCompatActivity() {
                 Toast.makeText(this, "Added ${item.name} to cart", Toast.LENGTH_SHORT).show()
             },
             onFavoriteClick = { item ->
-                // ở Favorites có thể là removeFavorite rồi reload, hoặc tạm thời chỉ toast
-                Toast.makeText(this, "Favorite clicked: ${item.name}", Toast.LENGTH_SHORT).show()
+                removeFromFavoritesAndUi(item)
             },
             favoriteIds = favoriteIds
         )
 
         rvFavorites.layoutManager = LinearLayoutManager(this)
         rvFavorites.adapter = adapter
+    }
+
+    private fun removeFromFavoritesAndUi(item: Item) {
+        val userId = sessionManager.getUserId()
+        val itemId = item._id
+
+        if (userId.isNullOrBlank() || itemId.isNullOrBlank()) {
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        FavoriteDAO.removeFavorite(userId, itemId) { success, msg ->
+            runOnUiThread {
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                if (success) {
+                    // Xoá item khỏi list đang hiển thị
+                    val current = adapter.getItems().toMutableList()
+                    val index = current.indexOfFirst { it._id == itemId }
+                    if (index != -1) {
+                        current.removeAt(index)
+                        adapter.updateItems(current)
+                        if (current.isEmpty()) {
+                            tvEmptyFavorites.visibility = View.VISIBLE
+                            rvFavorites.visibility = View.GONE
+                        }
+                    }
+                    favoriteIds.remove(itemId) // nếu có dùng set
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -151,6 +180,9 @@ class FavoritesActivity : AppCompatActivity() {
                 } else {
                     tvEmptyFavorites.visibility = View.GONE
                     rvFavorites.visibility = View.VISIBLE
+
+                    favoriteIds.clear()
+                    favoriteIds.addAll(items.mapNotNull { it._id })   // để adapter set icon filled
                     adapter.updateItems(items)
                 }
             }
