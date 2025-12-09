@@ -29,7 +29,7 @@
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="0dp"
         android:src="@drawable/ic_favorite_border"
         android:background="@android:color/transparent"
         android:tint="@color/dark_brown"
@@ -83,18 +83,18 @@
             app:layout_constraintStart_toEndOf="@id/ivDrinkItemImage"
             app:layout_constraintTop_toBottomOf="@id/tvDrinkItemDescription"
             app:layout_constraintBottom_toBottomOf="parent" />
-
-        <!-- Nút cộng: hạ thấp hẳn xuống đáy card -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAddOrder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="48dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:clickable="true"
+            android:focusable="true"
             app:fabSize="mini"
             app:backgroundTint="@color/brown"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:srcCompat="@drawable/ic_add"
             app:tint="@color/white" />
 
