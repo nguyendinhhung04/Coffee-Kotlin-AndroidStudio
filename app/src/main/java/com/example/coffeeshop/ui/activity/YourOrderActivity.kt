@@ -32,6 +32,8 @@ class YourOrderActivity : AppCompatActivity() {
     private var showingRecently: Boolean = true
 
     private lateinit var ivMenu: ImageView
+    private lateinit var ivNotification: ImageView
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,11 +51,18 @@ class YourOrderActivity : AppCompatActivity() {
         setupOrderFilterButtons()
 
         ivMenu = findViewById(R.id.ivYourOrdersMenu)
+        ivNotification = findViewById(R.id.ivBell)
 
         ivMenu.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
+
+        ivNotification.setOnClickListener {
+            val intent = Intent(this, NotificationActivity::class.java)
+            startActivity(intent)
+        }
+
 
         // Mặc định: Recently
         btnRecently.performClick()

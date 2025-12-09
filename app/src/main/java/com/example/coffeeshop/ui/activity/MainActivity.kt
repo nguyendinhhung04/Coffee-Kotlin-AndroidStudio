@@ -29,6 +29,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var ivMenu: ImageView
 
+    private lateinit var ivNotification: ImageView
+
+
 
     // Trình khởi chạy cho yêu cầu quyền
     private val requestPermissionLauncher = registerForActivityResult(
@@ -60,11 +63,18 @@ class MainActivity : AppCompatActivity() {
         tvGreeting = findViewById(R.id.tvGreeting)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
         ivMenu = findViewById(R.id.ivMenu)   // <-- use ivMenu from XML
+        ivNotification = findViewById(R.id.ivBell)
 
         ivMenu.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
+
+        ivNotification.setOnClickListener {
+            val intent = Intent(this, NotificationActivity::class.java)
+            startActivity(intent)
+        }
+
 
         loadUserInfo()
         setupBottomNavigation()
