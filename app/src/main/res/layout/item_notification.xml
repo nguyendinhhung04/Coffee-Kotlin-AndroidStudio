@@ -4,60 +4,93 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="12dp"
-    android:layout_marginTop="6dp"
-    android:layout_marginEnd="12dp"
-    android:layout_marginBottom="6dp"
-    app:cardBackgroundColor="@color/white"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Tiêu đề thông báo -->
+        <!-- Notification Icon -->
+        <ImageView
+            android:id="@+id/ivNotificationIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:background="@drawable/bg_search_rounded"
+            android:backgroundTint="@color/backgroundLight"
+            android:src="@drawable/ic_bell"
+            app:tint="@color/brown"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Notification Title -->
         <TextView
-            android:id="@+id/textViewTitle"
+            android:id="@+id/textViewNotificationTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/black"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/dark_brown"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Khuyến mãi đặc biệt!" />
+            android:fontFamily="@font/inter"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@+id/ivNotificationIcon"
+            app:layout_constraintEnd_toStartOf="@+id/viewUnreadIndicator"
+            app:layout_constraintTop_toTopOf="@+id/ivNotificationIcon"
+            tools:text="Your order is ready!" />
 
-        <!-- Nội dung thông báo -->
+        <!-- Notification Body -->
         <TextView
-            android:id="@+id/textViewMessage"
+            android:id="@+id/textViewNotificationBody"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="4dp"
-            android:ellipsize="end"
-            android:maxLines="2"
+            android:layout_marginEnd="8dp"
             android:textColor="@color/gray"
             android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@id/textViewTitle"
-            app:layout_constraintStart_toStartOf="@id/textViewTitle"
-            app:layout_constraintTop_toBottomOf="@id/textViewTitle"
-            tools:text="Giảm giá 50% cho tất cả các loại cà phê. Đừng bỏ lỡ cơ hội này." />
+            android:fontFamily="@font/inter"
+            android:maxLines="3"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@+id/ivNotificationIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewNotificationTitle"
+            tools:text="Your Coffee Latte is ready for pickup. Please collect it from the counter." />
 
-        <!-- Thời gian nhận thông báo -->
+        <!-- Notification Date/Time -->
         <TextView
-            android:id="@+id/textViewTimestamp"
-            android:layout_width="wrap_content"
+            android:id="@+id/textViewNotificationDate"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:textColor="@color/gray"
+            android:textColor="@color/lightGray"
             android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="@id/textViewMessage"
-            app:layout_constraintTop_toBottomOf="@id/textViewMessage"
-            tools:text="5 phút trước" />
+            android:fontFamily="@font/inter"
+            app:layout_constraintStart_toEndOf="@+id/ivNotificationIcon"
+            app:layout_constraintTop_toBottomOf="@+id/textViewNotificationBody"
+            tools:text="2 hours ago" />
+
+        <!-- Unread Indicator -->
+        <View
+            android:id="@+id/viewUnreadIndicator"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/bg_cart_badge"
+            android:backgroundTint="@color/brown"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textViewNotificationTitle"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

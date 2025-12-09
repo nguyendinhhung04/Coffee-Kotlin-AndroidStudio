@@ -26,7 +26,7 @@ class NotificationActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Cài đặt Toolbar
-        setSupportActionBar(binding.toolbar)
+        setSupportActionBar(binding.toolbarNotification)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Khởi tạo Adapter với danh sách rỗng
@@ -66,7 +66,6 @@ class NotificationActivity : AppCompatActivity() {
                 } else {
                     binding.recyclerViewNotifications.visibility = View.GONE
                     binding.textViewNoNotifications.visibility = View.VISIBLE
-                    binding.textViewNoNotifications.text = "Lỗi: $message"
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                 }
             }
