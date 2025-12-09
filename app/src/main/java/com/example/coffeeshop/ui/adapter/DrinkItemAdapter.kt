@@ -57,6 +57,10 @@ class DrinkItemAdapter(
             if (isFav) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_border
         )
 
+        holder.ivFavorite.setOnClickListener {
+            onFavoriteClick(item)
+        }
+
         try {
             // Try to load from assets/item_img/
             val inputStream = context.assets.open("item_img/$imageName")

@@ -106,13 +106,15 @@ class DrinkMenuActivity : AppCompatActivity() {
         val itemId = item._id
 
         if (userId.isNullOrBlank() || itemId.isNullOrBlank()) {
-            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please log in first", Toast.LENGTH_SHORT).show()
             return
         }
 
         if (favoriteIds.contains(itemId)) {
+            // Đã tồn tại -> xoá
             FavoriteDAO.removeFavorite(userId, itemId) { success, msg ->
                 runOnUiThread {
+                    Log.d("Fav", "favoriteIds=$favoriteIds, click itemId=$itemId")
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                     if (success) {
                         favoriteIds.remove(itemId)
@@ -121,9 +123,9 @@ class DrinkMenuActivity : AppCompatActivity() {
                 }
             }
         } else {
+            // Chưa có -> thêm
             FavoriteDAO.addFavorite(userId, itemId) { success, msg ->
                 runOnUiThread {
-                    Log.d("Fav", "addFavorite result success=$success, msg=$msg")
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                     if (success) {
                         favoriteIds.add(itemId)
@@ -254,5 +256,14 @@ class DrinkMenuActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateCartBadge()
+
+        val userId = sessionManager.getUserId() ?: return
+        FavoriteDAO.getFavoritesByUser(userId) { success, _, items ->
+            if (success && items != null) {
+                favoriteIds.clear()
+                favoriteIds.addAll(items.mapNotNull { it._id })
+                runOnUiThread { drinkAdapter.notifyDataSetChanged() }
+            }
+        }
     }
 }
