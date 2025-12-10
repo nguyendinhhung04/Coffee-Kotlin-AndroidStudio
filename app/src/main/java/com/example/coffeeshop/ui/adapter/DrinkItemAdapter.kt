@@ -15,7 +15,9 @@ import java.util.*
 
 class DrinkItemAdapter(
     private var items: List<Item>,
-    private val onAddClick: (Item) -> Unit
+    private val onAddClick: (Item) -> Unit,
+    private val onFavoriteClick: (Item) -> Unit,
+    private val favoriteIds: MutableSet<String>
 ) : RecyclerView.Adapter<DrinkItemAdapter.DrinkViewHolder>() {
 
     inner class DrinkViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -24,6 +26,10 @@ class DrinkItemAdapter(
         val tvDescription: TextView = view.findViewById(R.id.tvDrinkItemDescription)
         val tvPrice: TextView = view.findViewById(R.id.tvDrinkItemPrice)
         val fabAdd: FloatingActionButton = view.findViewById(R.id.fabAddOrder)
+
+        val ivFavorite: ImageView = view.findViewById(R.id.ivFavorite)
+
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrinkViewHolder {
@@ -38,13 +44,22 @@ class DrinkItemAdapter(
         holder.tvTitle.text = item.name
         holder.tvDescription.text = item.description
 
-        // Format price in VND
         val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
         holder.tvPrice.text = formatter.format(item.basePrice)
 
         // Load image from assets/item_img folder
         val context = holder.itemView.context
         val imageName = item.image_url
+
+        val isFav = item._id != null && favoriteIds.contains(item._id)
+        holder.ivFavorite.setImageResource(
+            if (isFav) R.drawable.ic_favorite_filled
+            else R.drawable.ic_favorite_border
+        )
+
+        holder.ivFavorite.setOnClickListener { onFavoriteClick(item) }
+        holder.fabAdd.setOnClickListener { onAddClick(item) }
+        holder.itemView.setOnClickListener { onAddClick(item) }
 
         try {
             // Try to load from assets/item_img/
@@ -59,13 +74,17 @@ class DrinkItemAdapter(
             holder.ivImage.setImageResource(R.drawable.socola)
         }
 
-        holder.fabAdd.setOnClickListener {
-            onAddClick(item)
+
+        fun updateItems(newItems: List<Item>) {
+            items = newItems
+            notifyDataSetChanged()
         }
-        holder.itemView.setOnClickListener { onAddClick(item) }
+
     }
 
     override fun getItemCount(): Int = items.size
+    fun getItems(): List<Item> = items
+
 
     fun updateItems(newItems: List<Item>) {
         items = newItems
