@@ -138,18 +138,21 @@ class FavoritesActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.navigation_home -> {
                     startActivity(Intent(this, MainActivity::class.java))
+                    overridePendingTransition(0, 0)
                     finish()
                     true
                 }
 
                 R.id.navigation_drink_menu -> {
                     startActivity(Intent(this, DrinkMenuActivity::class.java))
+                    overridePendingTransition(0, 0)
                     finish()
                     true
                 }
 
                 R.id.navigation_your_order -> {
                     startActivity(Intent(this, YourOrderActivity::class.java))
+                    overridePendingTransition(0, 0)
                     finish()
                     true
                 }

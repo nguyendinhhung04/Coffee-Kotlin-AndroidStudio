@@ -151,15 +151,18 @@ class DrinkMenuActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     // Không dùng finish() để MainActivity load lại
                     startActivity(Intent(this, MainActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.navigation_drink_menu -> true
                 R.id.navigation_your_order -> {
                     startActivity(Intent(this, YourOrderActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.navigation_favorites -> {
                     startActivity(Intent(this, FavoritesActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 else -> false

@@ -330,14 +330,17 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home -> true
                 R.id.navigation_drink_menu -> {
                     startActivity(Intent(this, DrinkMenuActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.navigation_your_order -> {
                     startActivity(Intent(this, YourOrderActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.navigation_favorites -> {
                     startActivity(Intent(this, FavoritesActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 else -> false
