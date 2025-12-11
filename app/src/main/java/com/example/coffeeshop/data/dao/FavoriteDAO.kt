@@ -1,16 +1,22 @@
 package com.example.coffeeshop.data.dao
 
 import android.util.Log
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import org.json.JSONArray
-import org.json.JSONObject
-import java.io.IOException
+import com.example.coffeeshop.data.model.ComboItem
 import com.example.coffeeshop.data.model.Item
+import com.example.coffeeshop.data.model.Promotion
 import com.example.coffeeshop.data.model.Size
 import com.example.coffeeshop.data.model.TempOption
 import com.example.coffeeshop.data.model.Topping
+import java.io.IOException
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONArray
+import org.json.JSONObject
 
 object FavoriteDAO {
     private val client = OkHttpClient()
@@ -196,19 +202,74 @@ object FavoriteDAO {
             }
         }
 
+        val promotionObj = obj.optJSONObject("promotion")
+        val promotion = if (promotionObj != null) parsePromotion(promotionObj) else null
+        
+        val basePrice = obj.optDouble("basePrice", 0.0)
+
         return Item(
             _id = obj.optString("_id"),
             name = obj.optString("name"),
             category = obj.optString("category"),
             image_url = obj.optString("image_url"),
-            basePrice = obj.optDouble("basePrice", 0.0),
+            basePrice = basePrice,
+            discountedPrice = obj.optDouble("discountedPrice", basePrice),
             description = obj.optString("description"),
             sizes = sizes,
             tempOptions = temps,
             iceLevels = iceLevels,
             sugarLevels = sugarLevels,
             toppings = toppings,
+            promotion = promotion,
             isActive = obj.optBoolean("isActive", true)
+        )
+    }
+
+    private fun parsePromotion(promoObj: JSONObject): Promotion {
+        val productIdsJson = promoObj.optJSONArray("productIds")
+        val productIds = mutableListOf<String>()
+        if (productIdsJson != null) {
+            for (j in 0 until productIdsJson.length()) {
+                productIds.add(productIdsJson.getString(j))
+            }
+        }
+
+        val categoriesJson = promoObj.optJSONArray("categories")
+        val categories = mutableListOf<String>()
+        if (categoriesJson != null) {
+            for (j in 0 until categoriesJson.length()) {
+                categories.add(categoriesJson.getString(j))
+            }
+        }
+
+        val comboItemsJson = promoObj.optJSONArray("comboItems")
+        val comboItems = mutableListOf<ComboItem>()
+        if (comboItemsJson != null) {
+            for (j in 0 until comboItemsJson.length()) {
+                val comboItemObj = comboItemsJson.getJSONObject(j)
+                comboItems.add(
+                    ComboItem(
+                        productId = comboItemObj.getString("productId"),
+                        requiredQty = comboItemObj.getInt("requiredQty")
+                    )
+                )
+            }
+        }
+
+        return Promotion(
+            _id = promoObj.getString("_id"),
+            name = promoObj.getString("name"),
+            description = promoObj.getString("description"),
+            type = promoObj.getString("type"),
+            scope = promoObj.getString("scope"),
+            value = promoObj.getDouble("value"),
+            startDate = promoObj.optString("startDate"),
+            endDate = promoObj.optString("endDate"),
+            minOrderTotal = promoObj.optDouble("minOrderTotal"),
+            isActive = promoObj.optBoolean("isActive", true),
+            productIds = productIds,
+            categories = categories,
+            comboItems = comboItems
         )
     }
 

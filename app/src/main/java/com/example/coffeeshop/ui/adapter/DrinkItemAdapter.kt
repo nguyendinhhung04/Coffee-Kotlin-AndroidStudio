@@ -1,5 +1,6 @@
 package com.example.coffeeshop.ui.adapter
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,10 +27,8 @@ class DrinkItemAdapter(
         val tvDescription: TextView = view.findViewById(R.id.tvDrinkItemDescription)
         val tvPrice: TextView = view.findViewById(R.id.tvDrinkItemPrice)
         val fabAdd: FloatingActionButton = view.findViewById(R.id.fabAddOrder)
-
+        val tvOriginalPrice: TextView = view.findViewById(R.id.tvOriginalPrice)
         val ivFavorite: ImageView = view.findViewById(R.id.ivFavorite)
-
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrinkViewHolder {
@@ -45,11 +44,27 @@ class DrinkItemAdapter(
         holder.tvDescription.text = item.description
 
         val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
-        holder.tvPrice.text = formatter.format(item.basePrice)
 
-        // Load image from assets/item_img folder
+        if (item.discountedPrice > 0 && item.discountedPrice < item.basePrice) {
+            holder.tvPrice.text = formatter.format(item.discountedPrice)
+            holder.tvOriginalPrice.text = formatter.format(item.basePrice)
+            holder.tvOriginalPrice.visibility = View.VISIBLE
+            holder.tvOriginalPrice.paintFlags = holder.tvOriginalPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            holder.tvPrice.text = formatter.format(item.basePrice)
+            holder.tvOriginalPrice.visibility = View.GONE
+            holder.tvOriginalPrice.paintFlags = holder.tvOriginalPrice.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        }
+
         val context = holder.itemView.context
         val imageName = item.image_url
+        val imagePath = "file:///android_asset/item_img/$imageName"
+
+        Glide.with(context)
+            .load(imagePath)
+            .placeholder(R.drawable.socola)
+            .error(R.drawable.socola)
+            .into(holder.ivImage)
 
         val isFav = item._id != null && favoriteIds.contains(item._id)
         holder.ivFavorite.setImageResource(
@@ -60,31 +75,11 @@ class DrinkItemAdapter(
         holder.ivFavorite.setOnClickListener { onFavoriteClick(item) }
         holder.fabAdd.setOnClickListener { onAddClick(item) }
         holder.itemView.setOnClickListener { onAddClick(item) }
-
-        try {
-            // Try to load from assets/item_img/
-            val inputStream = context.assets.open("item_img/$imageName")
-            val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
-            holder.ivImage.setImageBitmap(bitmap)
-            inputStream.close()
-            android.util.Log.d("DrinkAdapter", "Image loaded: item_img/$imageName")
-        } catch (e: Exception) {
-            // If not found, use default image
-            android.util.Log.w("DrinkAdapter", "Image not found: item_img/$imageName, error: ${e.message}")
-            holder.ivImage.setImageResource(R.drawable.socola)
-        }
-
-
-        fun updateItems(newItems: List<Item>) {
-            items = newItems
-            notifyDataSetChanged()
-        }
-
     }
 
     override fun getItemCount(): Int = items.size
+    
     fun getItems(): List<Item> = items
-
 
     fun updateItems(newItems: List<Item>) {
         items = newItems
