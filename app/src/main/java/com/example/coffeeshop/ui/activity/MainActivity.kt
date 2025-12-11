@@ -6,12 +6,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.example.coffeeshop.R
 import com.example.coffeeshop.data.api.ApiClient
+import com.example.coffeeshop.data.model.Item
+import com.example.coffeeshop.data.model.Promotion
 import com.example.coffeeshop.data.models.FcmTokenRequest
 import com.example.coffeeshop.utils.UserSessionManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -19,8 +23,12 @@ import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import android.widget.ImageView
-import com.example.coffeeshop.ui.activity.SettingsActivity
+import com.example.coffeeshop.data.dao.ItemDAO
+import com.example.coffeeshop.data.dao.PromotionDAO
+import com.example.coffeeshop.ui.adapter.RecommendationAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
+
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: UserSessionManager
@@ -28,23 +36,31 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
 
     private lateinit var ivMenu: ImageView
-
     private lateinit var ivNotification: ImageView
 
+    // Best seller views
+    private lateinit var tvBestSellerTitle: TextView
+    private lateinit var tvBestSellerSubtitle: TextView
+    private lateinit var ivBestSellerImage: ImageView
+
+    // Promotion / lemonade section
+    private lateinit var tvNewLemonadeTitle: TextView
+    private lateinit var ivLemonadeImage: ImageView
+    private lateinit var rvRecommendations: RecyclerView
+    private lateinit var recAdapter: RecommendationAdapter
+
+    private var allItemsMap: Map<String, Item> = emptyMap()
 
 
-    // Trình khởi chạy cho yêu cầu quyền
+    // launcher xin quyền thông báo
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // Quyền đã được cấp. Bây giờ bạn có thể lưu token.
             Log.d("Permission", "POST_NOTIFICATIONS permission granted.")
             sessionManager.getUserId()?.let { saveFcmToken(it) }
         } else {
-            // Giải thích cho người dùng rằng thông báo đã bị tắt.
             Log.w("Permission", "POST_NOTIFICATIONS permission denied.")
-            // Bạn có thể muốn hiển thị một hộp thoại hoặc snackbar ở đây.
         }
     }
 
@@ -60,58 +76,141 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        // Bind views
         tvGreeting = findViewById(R.id.tvGreeting)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
-        ivMenu = findViewById(R.id.ivMenu)   // <-- use ivMenu from XML
+        ivMenu = findViewById(R.id.ivMenu)
         ivNotification = findViewById(R.id.ivBell)
 
+        tvBestSellerTitle = findViewById(R.id.tvBestSellerTitle)
+        tvBestSellerSubtitle = findViewById(R.id.tvBestSellerSubtitle)
+        ivBestSellerImage = findViewById(R.id.ivBestSellerImage)
+
+        tvNewLemonadeTitle = findViewById(R.id.tvNewLemonadeTitle)
+        ivLemonadeImage = findViewById(R.id.ivLemonadeImage)
+
+        rvRecommendations = findViewById(R.id.rvRecommendations)
+        recAdapter = RecommendationAdapter(emptyList()) { item: Item ->
+            // handle click, ví dụ: mở màn chi tiết
+            startActivity(Intent(this, DrinkMenuActivity::class.java))
+        }
+        rvRecommendations.apply {
+            layoutManager = LinearLayoutManager(
+                this@MainActivity,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+            adapter = recAdapter
+        }
+
         ivMenu.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         ivNotification.setOnClickListener {
-            val intent = Intent(this, NotificationActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, NotificationActivity::class.java))
         }
-
 
         loadUserInfo()
         setupBottomNavigation()
         askNotificationPermission()
+        loadHomeContent()
     }
 
     override fun onResume() {
         super.onResume()
-        loadUserInfo()  // đọc lại từ UserSessionManager mỗi lần quay về màn chính
+        loadUserInfo()
     }
 
-    private fun askNotificationPermission() {
-        // Điều này chỉ cần thiết cho API cấp 33 (TIRAMISU) trở lên
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-                PackageManager.PERMISSION_GRANTED
-            ) {
-                // SDK FCM (và ứng dụng của bạn) có thể đăng thông báo.
-                Log.d("Permission", "POST_NOTIFICATIONS permission already granted.")
-                sessionManager.getUserId()?.let { saveFcmToken(it) }
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                // TODO: Hiển thị giao diện người dùng giải thích lý do tại sao quyền là cần thiết
-                // Trong ví dụ này, chúng tôi sẽ chỉ yêu cầu quyền
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            } else {
-                // Yêu cầu quyền trực tiếp
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    private fun loadHomeContent() {
+        // B1: load toàn bộ items trước
+        ItemDAO.getAllItems { success, msg, items ->
+            runOnUiThread {
+                if (!success || items == null) {
+                    Log.w("Main", "All items error: $msg")
+                    // vẫn gọi top-selling, nhưng sẽ không có giá
+                    loadTopSellingSection()
+                    loadPromotionSection()
+                    return@runOnUiThread
+                }
+                // cache map theo _id
+                allItemsMap = items.associateBy { it._id as String }
+                // sau khi có map rồi mới load top-selling + promotion
+                loadTopSellingSection()
+                loadPromotionSection()
             }
-        } else {
-            // Đối với các phiên bản cũ hơn, quyền được cấp theo mặc định
-            sessionManager.getUserId()?.let { saveFcmToken(it) }
+        }
+    }
+
+    private fun loadTopSellingSection() {
+        ItemDAO.getTopSellingItems { success, msg, topItems ->
+            runOnUiThread {
+                Log.d("Main", "topSelling success=$success size=${topItems?.size} msg=$msg")
+                if (!success || topItems == null || topItems.isEmpty()) {
+                    Log.w("Main", "Top selling error: $msg")
+                    return@runOnUiThread
+                }
+
+                // map từng top item sang bản đầy đủ nếu có
+                val enriched = topItems.map { top ->
+                    allItemsMap[top._id] ?: top   // nếu không có thì dùng bản đơn giản
+                }
+
+                // best seller = item đầu
+                val best = enriched[0]
+                tvBestSellerTitle.text = best.name
+                tvBestSellerSubtitle.text =
+                    if (best.category.isNotBlank())
+                        best.category.replaceFirstChar { it.uppercase() }
+                    else
+                        "Best seller"
+                loadItemImage(best.image_url, ivBestSellerImage)
+
+                // recommendations = top 5
+                val recList = enriched.take(5)
+                recAdapter.update(recList)
+            }
         }
     }
 
 
+    private fun loadPromotionSection() {
+        PromotionDAO.getActivePromotions { success, msg, promos ->
+            runOnUiThread {
+                if (!success || promos == null || promos.isEmpty()) {
+                    Log.w("Main", "Promotions error: $msg")
+                    return@runOnUiThread
+                }
+                val p = promos[0]
+                tvNewLemonadeTitle.text = p.name
+            }
+        }
+    }
+
+
+    // ====== Notification permission ======
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                sessionManager.getUserId()?.let { saveFcmToken(it) }
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            sessionManager.getUserId()?.let { saveFcmToken(it) }
+        }
+    }
+
+    // ====== UI logic ======
+
     private fun loadUserInfo() {
-        // Lấy tên người dùng từ phiên
         val displayName = sessionManager.getDisplayName()
         tvGreeting.text = "Good day, $displayName"
     }
@@ -119,10 +218,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNavigation() {
         bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.navigation_home -> {
-                    // Đã ở trang chủ
-                    true
-                }
+                R.id.navigation_home -> true
                 R.id.navigation_drink_menu -> {
                     startActivity(Intent(this, DrinkMenuActivity::class.java))
                     true
@@ -138,8 +234,27 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-        // Đặt mục Home được chọn mặc định
         bottomNavigationView.selectedItemId = R.id.navigation_home
+    }
+
+    // ====== Call APIs for home content ======
+
+    // ====== Helpers ======
+
+    private fun loadItemImage(imageName: String, imageView: ImageView) {
+        try {
+            val inputStream = assets.open("item_img/$imageName")
+            val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+            imageView.setImageBitmap(bitmap)
+            inputStream.close()
+        } catch (e: Exception) {
+            imageView.setImageResource(R.drawable.socola)
+        }
+    }
+
+    private fun formatPrice(price: Double): String {
+        val nf = java.text.NumberFormat.getCurrencyInstance(java.util.Locale("vi", "VN"))
+        return nf.format(price)
     }
 
     private fun navigateToLogin() {
@@ -155,10 +270,7 @@ class MainActivity : AppCompatActivity() {
                 Log.w("FCM", "Fetching FCM registration token failed", task.exception)
                 return@addOnCompleteListener
             }
-
             val deviceToken = task.result
-            Log.d("FCM", "FCM Token: $deviceToken")
-
             val request = FcmTokenRequest(userId = userId, deviceToken = deviceToken)
             ApiClient.fcmApi.saveToken(request).enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
@@ -168,7 +280,6 @@ class MainActivity : AppCompatActivity() {
                         Log.e("FCM", "Failed to save token: ${response.code()}")
                     }
                 }
-
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     Log.e("FCM", "Failed to save token", t)
                 }
@@ -176,7 +287,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Nếu bạn có menu đăng xuất hoặc nút đăng xuất
     fun logout() {
         sessionManager.clearSession()
         navigateToLogin()

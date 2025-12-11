@@ -2,7 +2,7 @@
 "_id": "promo_combo_breakfast",
 "name": "Combo Cà phê Sữa Đá + Croissant",
 "description": "Combo bữa sáng 49k",
-"type": "FIXED_PRICE_COMBO",        // PERCENT | FIXED_AMOUNT | FIXED_PRICE_COMBO
+"type": "FIXED_PRICE_COM    BO",        // PERCENT | FIXED_AMOUNT | FIXED_PRICE_COMBO
 "scope": "COMBO",                   // ORDER | PRODUCT | CATEGORY | COMBO
 "value": 49000,                     // tuỳ type
 "startDate": ISODate("2025-12-01T00:00:00Z"),

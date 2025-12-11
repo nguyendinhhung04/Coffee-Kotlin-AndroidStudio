@@ -73,6 +73,73 @@ object ItemDAO {
         })
     }
 
+    fun getTopSellingItems(
+        callback: (success: Boolean, message: String, items: List<Item>?) -> Unit
+    ) {
+        val url = "$BASE_URL/items/top-selling"
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false, "Lỗi mạng: ${e.message}", null)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string()
+                if (!response.isSuccessful || body == null) {
+                    callback(false, "Lỗi server: ${response.code}", null)
+                    return
+                }
+                try {
+                    // ✅ parse object gốc
+                    val root = JSONObject(body)
+                    val success = root.optBoolean("success", false)
+                    val msg = root.optString("message", "")
+
+                    if (!success) {
+                        callback(false, msg, null)
+                        return
+                    }
+
+                    // ✅ mảng data bên trong
+                    val dataArray = root.getJSONArray("data")
+                    val items = mutableListOf<Item>()
+
+                    for (i in 0 until dataArray.length()) {
+                        val obj = dataArray.getJSONObject(i)
+
+                        // API top-selling trả ít field hơn: totalSold, productId, name, image_url
+                        // nên map đơn giản, chỉ dùng các field cần trong home
+                        val item = Item(
+                            _id = obj.optString("productId"),   // dùng productId làm id
+                            name = obj.optString("name"),
+                            category = "",
+                            image_url = obj.optString("image_url"),
+                            basePrice = 0.0,
+                            description = "",
+                            sizes = emptyList(),
+                            tempOptions = emptyList(),
+                            iceLevels = emptyList(),
+                            sugarLevels = emptyList(),
+                            toppings = emptyList(),
+                            isActive = true
+                        )
+                        items.add(item)
+                    }
+
+                    callback(true, "Tải top-selling: ${items.size} món", items)
+
+                } catch (e: Exception) {
+                    callback(false, "Lỗi parse JSON: ${e.message}", null)
+                }
+            }
+        })
+    }
+
+
     // ----------------------------
     // Lọc theo category
     // ----------------------------
@@ -225,4 +292,6 @@ object ItemDAO {
         }
         return list
     }
+
+
 }

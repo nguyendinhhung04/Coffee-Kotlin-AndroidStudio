@@ -23,6 +23,10 @@ object ApiClient {
         retrofit.create(OrderApi::class.java)
     }
 
+    val itemApi: ApiService by lazy { retrofit.create(ApiService::class.java) }
+
+    val promotionApi: ApiService by lazy { retrofit.create(ApiService::class.java) }
+
     val fcmApi: FcmApi by lazy {
         retrofit.create(FcmApi::class.java)
     }

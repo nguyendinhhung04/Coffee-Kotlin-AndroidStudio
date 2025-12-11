@@ -1,6 +1,7 @@
 package com.example.coffeeshop.data.api
 
 import com.example.coffeeshop.data.model.Item
+import com.example.coffeeshop.data.model.Promotion
 import retrofit2.Call
 import retrofit2.http.GET
 
@@ -13,4 +14,10 @@ interface ApiService {
 
     @GET("item/other/getall")
     fun getOtherItems(): Call<List<Item>>
+
+    @GET("items/top-selling")
+    fun getTopSellingItems(): Call<List<Item>>
+
+    @GET("promotions/active")
+    fun getActivePromotions(): Call<List<Promotion>>
 }
