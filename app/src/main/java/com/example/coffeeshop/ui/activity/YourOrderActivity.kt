@@ -16,6 +16,7 @@ import com.example.coffeeshop.utils.UserSessionManager
 import com.example.coffeeshop.ui.adapter.OrderAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.ImageView
+import com.example.coffeeshop.utils.CartManager
 import com.example.coffeeshop.ui.activity.SettingsActivity
 
 class YourOrderActivity : AppCompatActivity() {
@@ -39,6 +40,9 @@ class YourOrderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_your_order)
+
+        val cartItems = CartManager.getAllItems()
+        val total = CartManager.getTotalAmount()
 
         bottomNavigationView = findViewById(R.id.bottom_navigation_your_order)
         btnRecently = findViewById(R.id.btnRecently)

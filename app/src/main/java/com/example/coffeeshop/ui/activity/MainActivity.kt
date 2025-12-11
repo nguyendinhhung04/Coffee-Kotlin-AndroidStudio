@@ -27,6 +27,8 @@ import com.example.coffeeshop.data.dao.ItemDAO
 import com.example.coffeeshop.data.dao.PromotionDAO
 import com.example.coffeeshop.ui.adapter.RecommendationAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.coffeeshop.utils.CartManager
+import com.example.coffeeshop.data.model.CartItem
 
 
 class MainActivity : AppCompatActivity() {
@@ -91,9 +93,20 @@ class MainActivity : AppCompatActivity() {
 
         rvRecommendations = findViewById(R.id.rvRecommendations)
         recAdapter = RecommendationAdapter(emptyList()) { item: Item ->
-            // handle click, ví dụ: mở màn chi tiết
-            startActivity(Intent(this, DrinkMenuActivity::class.java))
+            // tạo CartItem tối thiểu (size, topping... để trống nếu chưa chọn)
+            val cartItem = CartItem(
+                item = item,
+                quantity = 1,
+                customizations = emptyMap(),
+                price = item.basePrice
+            )
+            CartManager.addItem(cartItem)
+
+            val intent = Intent(this, DrinkMenuActivity::class.java)
+            intent.putExtra("open_from_recommendation", true)
+            startActivity(intent)
         }
+
         rvRecommendations.apply {
             layoutManager = LinearLayoutManager(
                 this@MainActivity,
