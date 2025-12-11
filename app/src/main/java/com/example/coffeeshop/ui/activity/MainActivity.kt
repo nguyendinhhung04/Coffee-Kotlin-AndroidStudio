@@ -194,8 +194,12 @@ class MainActivity : AppCompatActivity() {
                     Log.w("Main", "Promotions error: $msg")
                     return@runOnUiThread
                 }
+                // ví dụ lấy promo đầu tiên
                 val p = promos[0]
-                tvNewLemonadeTitle.text = p.name
+
+                // Hiển thị tên + mô tả + giá combo
+                val priceText = String.format("%,.0f₫", p.value)
+                tvNewLemonadeTitle.text = "${p.name}\n${p.description}\n$priceText"
             }
         }
     }

@@ -50,11 +50,11 @@ object PromotionDAO {
 
     private fun parsePromotion(obj: JSONObject): Promotion {
         return Promotion(
-            _id = obj.optString("_id"),
-            name = obj.optString("name"),
-            description = obj.optString("description"),
-            type = obj.optString("type"),
-            scope = obj.optString("scope"),
+            _id = obj.optString("_id").orEmpty(),
+            name = obj.optString("name").orEmpty(),
+            description = obj.optString("description").orEmpty(),
+            type = obj.optString("type").orEmpty(),     // ví dụ: FIXED_PRICE_COMBO
+            scope = obj.optString("scope").orEmpty(),   // ví dụ: COMBO
             value = obj.optDouble("value", 0.0)
         )
     }
