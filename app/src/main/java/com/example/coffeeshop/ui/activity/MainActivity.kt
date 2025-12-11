@@ -29,6 +29,10 @@ import com.example.coffeeshop.ui.adapter.RecommendationAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.coffeeshop.utils.CartManager
 import com.example.coffeeshop.data.model.CartItem
+import com.example.coffeeshop.ui.adapter.PromotionAdapter
+import androidx.recyclerview.widget.PagerSnapHelper
+import android.os.Handler
+import android.os.Looper
 
 
 class MainActivity : AppCompatActivity() {
@@ -41,17 +45,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var ivNotification: ImageView
 
     // Best seller views
+    // Best seller views
     private lateinit var tvBestSellerTitle: TextView
     private lateinit var tvBestSellerSubtitle: TextView
     private lateinit var ivBestSellerImage: ImageView
 
-    // Promotion / lemonade section
-    private lateinit var tvNewLemonadeTitle: TextView
-    private lateinit var ivLemonadeImage: ImageView
+    // Recommendations + promotions
     private lateinit var rvRecommendations: RecyclerView
     private lateinit var recAdapter: RecommendationAdapter
-
     private var allItemsMap: Map<String, Item> = emptyMap()
+
+    private lateinit var rvPromotions: RecyclerView
+    private lateinit var promoAdapter: PromotionAdapter
+
+    private val promoHandler = Handler(Looper.getMainLooper())
+    private var promoAutoScrollRunnable: Runnable? = null
+    private val recHandler = Handler(Looper.getMainLooper())
+    private var recAutoScrollRunnable: Runnable? = null
+
 
 
     // launcher xin quyền thông báo
@@ -78,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        // Bind views
+        // ===== Bind views chung =====
         tvGreeting = findViewById(R.id.tvGreeting)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
         ivMenu = findViewById(R.id.ivMenu)
@@ -88,12 +99,9 @@ class MainActivity : AppCompatActivity() {
         tvBestSellerSubtitle = findViewById(R.id.tvBestSellerSubtitle)
         ivBestSellerImage = findViewById(R.id.ivBestSellerImage)
 
-        tvNewLemonadeTitle = findViewById(R.id.tvNewLemonadeTitle)
-        ivLemonadeImage = findViewById(R.id.ivLemonadeImage)
-
+        // ===== Recommendations =====
         rvRecommendations = findViewById(R.id.rvRecommendations)
         recAdapter = RecommendationAdapter(emptyList()) { item: Item ->
-            // tạo CartItem tối thiểu (size, topping... để trống nếu chưa chọn)
             val cartItem = CartItem(
                 item = item,
                 quantity = 1,
@@ -106,6 +114,14 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("open_from_recommendation", true)
             startActivity(intent)
         }
+        rvRecommendations.apply {
+            layoutManager = LinearLayoutManager(
+                this@MainActivity,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+            adapter = recAdapter
+        }
 
         rvRecommendations.apply {
             layoutManager = LinearLayoutManager(
@@ -116,6 +132,23 @@ class MainActivity : AppCompatActivity() {
             adapter = recAdapter
         }
 
+//        val recSnapHelper = PagerSnapHelper()
+//        recSnapHelper.attachToRecyclerView(rvRecommendations)
+
+        // ===== Promotions slider =====
+        rvPromotions = findViewById(R.id.rvPromotions)
+        promoAdapter = PromotionAdapter(emptyList()) { promo: Promotion ->
+            // ví dụ: mở màn Order hoặc chi tiết promotion
+            startActivity(Intent(this, YourOrderActivity::class.java))
+        }
+        rvPromotions.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        rvPromotions.adapter = promoAdapter
+
+        val snapHelper = PagerSnapHelper()
+        snapHelper.attachToRecyclerView(rvPromotions)
+
+        // ===== Clicks top bar =====
         ivMenu.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
@@ -124,15 +157,75 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, NotificationActivity::class.java))
         }
 
+        // ===== Logic khởi tạo =====
         loadUserInfo()
         setupBottomNavigation()
         askNotificationPermission()
         loadHomeContent()
     }
 
+
+    override fun onPause() {
+        super.onPause()
+        promoAutoScrollRunnable?.let { promoHandler.removeCallbacks(it) }
+        recAutoScrollRunnable?.let { recHandler.removeCallbacks(it) }
+    }
+
     override fun onResume() {
         super.onResume()
         loadUserInfo()
+        if (promoAdapter.itemCount > 0) {
+            startPromoAutoSlide()
+        }
+        if (recAdapter.itemCount > 0) {
+            startRecAutoSlide()
+        }
+    }
+
+    private fun startRecAutoSlide(intervalMs: Long = 4000L) {
+        // huỷ runnable cũ nếu có
+        recAutoScrollRunnable?.let { recHandler.removeCallbacks(it) }
+
+
+        recAutoScrollRunnable = object : Runnable {
+            override fun run() {
+                val lm = rvRecommendations.layoutManager as? LinearLayoutManager ?: return
+                val itemCount = recAdapter.itemCount
+                if (itemCount == 0) return
+
+                val current = lm.findFirstCompletelyVisibleItemPosition()
+                val safeCurrent = if (current == RecyclerView.NO_POSITION) 0 else current
+                val next = (safeCurrent + 1) % itemCount
+                Log.d("Main", "Rec auto tick: count=$itemCount current=$current next=$next")
+                rvRecommendations.scrollToPosition(next)
+
+
+                // DÒNG NÀY RẤT QUAN TRỌNG, nếu thiếu sẽ chỉ chạy 1 lần
+                recHandler.postDelayed(this, intervalMs)
+            }
+        }
+        recHandler.postDelayed(recAutoScrollRunnable!!, intervalMs)
+
+    }
+
+    private fun startPromoAutoSlide(intervalMs: Long = 3000L) {
+        // huỷ cũ nếu có
+        promoAutoScrollRunnable?.let { promoHandler.removeCallbacks(it) }
+
+        promoAutoScrollRunnable = object : Runnable {
+            override fun run() {
+                val lm = rvPromotions.layoutManager as? LinearLayoutManager ?: return
+                val itemCount = promoAdapter.itemCount
+                if (itemCount == 0) return
+
+                val current = lm.findFirstVisibleItemPosition()
+                val next = (current + 1) % itemCount
+                rvPromotions.smoothScrollToPosition(next)
+
+                promoHandler.postDelayed(this, intervalMs)
+            }
+        }
+        promoHandler.postDelayed(promoAutoScrollRunnable!!, intervalMs)
     }
 
     private fun loadHomeContent() {
@@ -182,9 +275,12 @@ class MainActivity : AppCompatActivity() {
                 // recommendations = top 5
                 val recList = enriched.take(5)
                 recAdapter.update(recList)
+
+                startRecAutoSlide()
             }
         }
     }
+
 
 
     private fun loadPromotionSection() {
@@ -194,12 +290,8 @@ class MainActivity : AppCompatActivity() {
                     Log.w("Main", "Promotions error: $msg")
                     return@runOnUiThread
                 }
-                // ví dụ lấy promo đầu tiên
-                val p = promos[0]
-
-                // Hiển thị tên + mô tả + giá combo
-                val priceText = String.format("%,.0f₫", p.value)
-                tvNewLemonadeTitle.text = "${p.name}\n${p.description}\n$priceText"
+                promoAdapter.update(promos)
+                startPromoAutoSlide()
             }
         }
     }
@@ -238,14 +330,17 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home -> true
                 R.id.navigation_drink_menu -> {
                     startActivity(Intent(this, DrinkMenuActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.navigation_your_order -> {
                     startActivity(Intent(this, YourOrderActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.navigation_favorites -> {
                     startActivity(Intent(this, FavoritesActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 else -> false
