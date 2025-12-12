@@ -74,7 +74,13 @@ class CartItemAdapter(
 
         // Price per line
         val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
-        holder.tvPrice.text = formatter.format(cartItem.getTotalPrice())
+        val pricePerItem = if (item.promotion != null && item.discountedPrice > 0) {
+            item.discountedPrice
+        } else {
+            cartItem.price
+        }
+        holder.tvPrice.text = formatter.format(pricePerItem * cartItem.quantity)
+
 
         // ===== Load image from assets/item_img/ =====
         val context = holder.itemView.context

@@ -14,7 +14,9 @@ data class Item(
     val iceLevels: List<String> = emptyList(),
     val sugarLevels: List<String> = emptyList(),
     val toppings: List<Topping> = emptyList(),
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    val promotion: Promotion?,        // Có thể null
+    val discountedPrice: Double       // Backend luôn trả
 ) : Serializable
 
 data class Size(

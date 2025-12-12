@@ -1,6 +1,8 @@
 package com.example.coffeeshop.data.dao
 
+import com.example.coffeeshop.data.model.ComboItem
 import com.example.coffeeshop.data.model.Item
+import com.example.coffeeshop.data.model.Promotion
 import com.example.coffeeshop.data.model.Size
 import com.example.coffeeshop.data.model.TempOption
 import com.example.coffeeshop.data.model.Topping
@@ -38,11 +40,14 @@ object ItemDAO {
 
                         for (i in 0 until jsonArray.length()) {
                             val obj = jsonArray.getJSONObject(i)
+
                             val sizes = parseSizes(obj.optJSONArray("sizes"))
                             val temps = parseTempOptions(obj.optJSONArray("tempOptions"))
                             val toppings = parseToppings(obj.optJSONArray("toppings"))
-                            val iceLevels = jsonArrayToStringList(obj.optJSONArray("iceLevels"))
-                            val sugarLevels = jsonArrayToStringList(obj.optJSONArray("sugarLevels"))
+
+                            // ❌ iceLevels & sugarLevels không còn trong backend → list rỗng
+                            val iceLevels = emptyList<String>()
+                            val sugarLevels = emptyList<String>()
 
                             val item = Item(
                                 _id = obj.optString("_id"),
@@ -56,7 +61,11 @@ object ItemDAO {
                                 iceLevels = iceLevels,
                                 sugarLevels = sugarLevels,
                                 toppings = toppings,
-                                isActive = obj.optBoolean("isActive", true)
+                                isActive = obj.optBoolean("isActive", true),
+                                promotion = parsePromotion(obj.optJSONObject("promotion")),                 // NEW
+                                discountedPrice = obj.optDouble("discountedPrice",          // NEW
+                                    obj.optDouble("basePrice"))
+
                             )
                             items.add(item)
                         }
@@ -72,6 +81,7 @@ object ItemDAO {
             }
         })
     }
+
 
     fun getTopSellingItems(
         callback: (success: Boolean, message: String, items: List<Item>?) -> Unit
@@ -125,7 +135,11 @@ object ItemDAO {
                             iceLevels = emptyList(),
                             sugarLevels = emptyList(),
                             toppings = emptyList(),
-                            isActive = true
+                            isActive = true,
+                            promotion = parsePromotion(obj.optJSONObject("Promotion")),                 // NEW
+                            discountedPrice = obj.optDouble("discountedPrice",          // NEW
+                                obj.optDouble("basePrice"))
+
                         )
                         items.add(item)
                     }
@@ -158,13 +172,13 @@ object ItemDAO {
                     try {
                         val jsonArray = JSONArray(body)
                         val items = mutableListOf<Item>()
+
                         for (i in 0 until jsonArray.length()) {
                             val obj = jsonArray.getJSONObject(i)
+
                             val sizes = parseSizes(obj.optJSONArray("sizes"))
                             val temps = parseTempOptions(obj.optJSONArray("tempOptions"))
                             val toppings = parseToppings(obj.optJSONArray("toppings"))
-                            val iceLevels = jsonArrayToStringList(obj.optJSONArray("iceLevels"))
-                            val sugarLevels = jsonArrayToStringList(obj.optJSONArray("sugarLevels"))
 
                             val item = Item(
                                 _id = obj.optString("_id"),
@@ -175,13 +189,18 @@ object ItemDAO {
                                 description = obj.optString("description"),
                                 sizes = sizes,
                                 tempOptions = temps,
-                                iceLevels = iceLevels,
-                                sugarLevels = sugarLevels,
+                                iceLevels = emptyList(),
+                                sugarLevels = emptyList(),
                                 toppings = toppings,
-                                isActive = obj.optBoolean("isActive", true)
+                                isActive = obj.optBoolean("isActive", true),
+                                promotion = parsePromotion(obj.optJSONObject("promotion")),                 // NEW
+                                discountedPrice = obj.optDouble("discountedPrice",          // NEW
+                                    obj.optDouble("basePrice"))
+
                             )
                             items.add(item)
                         }
+
                         callback(true, "Tải $category: ${items.size} món", items)
 
                     } catch (e: Exception) {
@@ -212,13 +231,13 @@ object ItemDAO {
                     try {
                         val jsonArray = JSONArray(body)
                         val items = mutableListOf<Item>()
+
                         for (i in 0 until jsonArray.length()) {
                             val obj = jsonArray.getJSONObject(i)
+
                             val sizes = parseSizes(obj.optJSONArray("sizes"))
                             val temps = parseTempOptions(obj.optJSONArray("tempOptions"))
                             val toppings = parseToppings(obj.optJSONArray("toppings"))
-                            val iceLevels = jsonArrayToStringList(obj.optJSONArray("iceLevels"))
-                            val sugarLevels = jsonArrayToStringList(obj.optJSONArray("sugarLevels"))
 
                             val item = Item(
                                 _id = obj.optString("_id"),
@@ -229,14 +248,20 @@ object ItemDAO {
                                 description = obj.optString("description"),
                                 sizes = sizes,
                                 tempOptions = temps,
-                                iceLevels = iceLevels,
-                                sugarLevels = sugarLevels,
+                                iceLevels = emptyList(),
+                                sugarLevels = emptyList(),
                                 toppings = toppings,
-                                isActive = obj.optBoolean("isActive", true)
+                                isActive = obj.optBoolean("isActive", true),
+                                promotion = parsePromotion(obj.optJSONObject("promotion")),                 // NEW
+                                discountedPrice = obj.optDouble("discountedPrice",          // NEW
+                                    obj.optDouble("basePrice"))
+
                             )
                             items.add(item)
                         }
+
                         callback(true, "Tìm thấy ${items.size} kết quả", items)
+
                     } catch (e: Exception) {
                         callback(false, "Lỗi parse JSON: ${e.message}", null)
                     }
@@ -279,6 +304,41 @@ object ItemDAO {
                 val obj = jsonArray.getJSONObject(i)
                 list.add(Topping(obj.optString("name"), obj.optDouble("price")))
             }
+        }
+        return list
+    }
+
+    private fun parsePromotion(json: JSONObject?): Promotion? {
+        if (json == null) return null
+
+        return Promotion(
+            _id = json.optString("_id"),
+            name = json.optString("name"),
+            description = json.optString("description"),
+            type = json.optString("type"),
+            scope = json.optString("scope"),
+            value = json.optDouble("value"),
+            startDate = json.optString("startDate"),
+            endDate = json.optString("endDate"),
+            minOrderTotal = if (json.has("minOrderTotal")) json.optDouble("minOrderTotal") else null,
+            isActive = json.optBoolean("isActive", true),
+            productIds = jsonArrayToStringList(json.optJSONArray("productIds")),
+            categories = jsonArrayToStringList(json.optJSONArray("categories")),
+            comboItems = parseComboItems(json.optJSONArray("comboItems"))
+        )
+    }
+
+    private fun parseComboItems(jsonArray: JSONArray?): List<ComboItem>? {
+        if (jsonArray == null) return null
+        val list = mutableListOf<ComboItem>()
+        for (i in 0 until jsonArray.length()) {
+            val obj = jsonArray.getJSONObject(i)
+            list.add(
+                ComboItem(
+                    productId = obj.optString("productId"),
+                    requiredQty = obj.optInt("requiredQty")
+                )
+            )
         }
         return list
     }
