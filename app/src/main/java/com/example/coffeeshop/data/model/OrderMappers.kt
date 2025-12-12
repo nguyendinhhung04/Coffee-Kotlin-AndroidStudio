@@ -65,11 +65,20 @@ fun buildOrderDTOFromCart(
             }
         }
 
+        val item = cartItem.item
+        val customizationCost = cartItem.price - item.basePrice
+        val effectivePrice = if (item.discountedPrice > 0) {
+            item.discountedPrice
+        } else {
+            item.basePrice
+        }
+        val finalUnitPrice = effectivePrice + customizationCost
+
         OrderItemDTO(
             productId = cartItem.item._id,
             productName = cartItem.item.name,
             quantity = cartItem.quantity,
-            finalUnitPrice = cartItem.price,
+            finalUnitPrice = finalUnitPrice,
             sizeChosen = sizeChosen,
             tempChosen = tempChosen,
             iceLevel = iceLevel,

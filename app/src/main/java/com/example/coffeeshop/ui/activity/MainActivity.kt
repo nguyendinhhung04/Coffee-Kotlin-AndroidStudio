@@ -102,11 +102,12 @@ class MainActivity : AppCompatActivity() {
         // ===== Recommendations =====
         rvRecommendations = findViewById(R.id.rvRecommendations)
         recAdapter = RecommendationAdapter(emptyList()) { item: Item ->
+            val price = if (item.discountedPrice > 0) item.discountedPrice else item.basePrice
             val cartItem = CartItem(
                 item = item,
                 quantity = 1,
                 customizations = emptyMap(),
-                price = item.basePrice
+                price = price
             )
             CartManager.addItem(cartItem)
 
