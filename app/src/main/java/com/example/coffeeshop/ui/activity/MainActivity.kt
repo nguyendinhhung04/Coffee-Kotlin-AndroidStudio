@@ -33,8 +33,9 @@ import com.example.coffeeshop.ui.adapter.PromotionAdapter
 import androidx.recyclerview.widget.PagerSnapHelper
 import android.os.Handler
 import android.os.Looper
+import androidx.cardview.widget.CardView
 import com.example.coffeeshop.data.repo.ItemRepository
-
+import com.example.coffeeshop.data.dao.PointsDAO
 
 class MainActivity : AppCompatActivity() {
 
@@ -64,6 +65,8 @@ class MainActivity : AppCompatActivity() {
     private val recHandler = Handler(Looper.getMainLooper())
     private var recAutoScrollRunnable: Runnable? = null
 
+    private lateinit var cardPoints: CardView
+    private lateinit var tvPointsValue: TextView
 
 
     // launcher xin quyền thông báo
@@ -99,6 +102,18 @@ class MainActivity : AppCompatActivity() {
         tvBestSellerTitle = findViewById(R.id.tvBestSellerTitle)
         tvBestSellerSubtitle = findViewById(R.id.tvBestSellerSubtitle)
         ivBestSellerImage = findViewById(R.id.ivBestSellerImage)
+
+        //loyalty points
+        cardPoints = findViewById(R.id.cardPoints)
+        tvPointsValue = findViewById(R.id.tvPointsValue)
+
+        loadUserPoints()
+
+        cardPoints.setOnClickListener {
+            val intent = Intent(this, DrinkMenuActivity::class.java)
+            startActivity(intent)
+        }
+
 
         // ===== Recommendations =====
         rvRecommendations = findViewById(R.id.rvRecommendations)
@@ -181,6 +196,21 @@ class MainActivity : AppCompatActivity() {
         }
         if (recAdapter.itemCount > 0) {
             startRecAutoSlide()
+        }
+    }
+
+    private fun loadUserPoints() {
+        val session = UserSessionManager(this)
+        val userId = session.getUserId() ?: return
+
+        PointsDAO.getUserPoints(userId) { success, message, points ->
+            runOnUiThread {
+                if (success && points != null) {
+                    tvPointsValue.text = "$points điểm"
+                } else {
+                    tvPointsValue.text = "0 điểm"
+                }
+            }
         }
     }
 
