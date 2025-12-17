@@ -48,6 +48,47 @@
             android:textColor="@color/dark_brown"
             android:textColorHint="@color/dark_brown" />
 
+        <EditText
+            android:id="@+id/etStreet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Số nhà, đường"
+            android:textColor="@color/dark_brown"
+            android:textColorHint="@color/dark_brown" />
+
+        <EditText
+            android:id="@+id/etWard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phường/Xã"
+            android:textColor="@color/dark_brown"
+            android:textColorHint="@color/dark_brown" />
+
+        <EditText
+            android:id="@+id/etDistrict"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Quận/Huyện"
+            android:textColor="@color/dark_brown"
+            android:textColorHint="@color/dark_brown" />
+
+        <EditText
+            android:id="@+id/etCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Thành phố/Tỉnh"
+            android:textColor="@color/dark_brown"
+            android:textColorHint="@color/dark_brown" />
+
+        <CheckBox
+            android:id="@+id/cbDefaultAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đặt làm địa chỉ nhận hàng mặc định"
+            android:textColor="@color/dark_brown"
+            android:layout_marginTop="8dp" />
+
         <Button
             android:id="@+id/btnSaveProfile"
             android:layout_width="match_parent"
