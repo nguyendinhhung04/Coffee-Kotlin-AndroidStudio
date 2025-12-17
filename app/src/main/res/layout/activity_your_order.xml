@@ -22,16 +22,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/ivBell"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+    <FrameLayout
+        android:id="@+id/layoutBell"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_bell"
+        android:padding="4dp"
         app:layout_constraintEnd_toStartOf="@+id/ivYourOrdersMenu"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/dark_brown" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivBell"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_bell"
+            app:tint="@color/dark_brown" />
+
+        <View
+            android:id="@+id/viewNotificationDot"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
+            android:background="@drawable/bg_notification_dot"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/ivYourOrdersMenu"

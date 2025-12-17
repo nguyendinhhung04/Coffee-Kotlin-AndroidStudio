@@ -74,4 +74,5 @@ dependencies {
     // Import Firebase BOM để quản lý versions
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)   // Cloud Messaging
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
 }
