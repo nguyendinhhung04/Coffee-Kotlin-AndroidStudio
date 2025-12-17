@@ -43,6 +43,7 @@ class OrderAdapter(
 
         // Tên order = tên món đầu tiên, fallback về mã
         val firstItemName = order.items.firstOrNull()?.productName ?: "Order #${position + 1}"
+
         holder.tvOrderTitle.text = firstItemName
 
         // Format thời gian
