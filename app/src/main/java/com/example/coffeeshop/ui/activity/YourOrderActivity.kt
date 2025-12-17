@@ -16,6 +16,10 @@ import com.example.coffeeshop.utils.UserSessionManager
 import com.example.coffeeshop.ui.adapter.OrderAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.ImageView
+import com.example.coffeeshop.data.model.CartItem
+import com.example.coffeeshop.data.model.Item
+import com.example.coffeeshop.data.model.OrderItem
+import com.example.coffeeshop.data.repo.ItemRepository
 import com.example.coffeeshop.utils.CartManager
 import com.example.coffeeshop.ui.activity.SettingsActivity
 
@@ -34,6 +38,7 @@ class YourOrderActivity : AppCompatActivity() {
 
     private lateinit var ivMenu: ImageView
     private lateinit var ivNotification: ImageView
+    private val pastOrders: MutableList<Order> = mutableListOf()
 
 
 
@@ -79,11 +84,18 @@ class YourOrderActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        orderAdapter = OrderAdapter(emptyList()) { order ->
-            val intent = Intent(this, OrderDetailActivity::class.java)
-            intent.putExtra("order_id", order._id ?: "")
-            startActivity(intent)
-        }
+        orderAdapter = OrderAdapter(
+            emptyList(),
+            onOrderClick = { order ->
+                val intent = Intent(this, OrderDetailActivity::class.java)
+                intent.putExtra("order_id", order._id ?: "")
+                startActivity(intent)
+            },
+            onReorderClick = { order ->
+                handleReorder(order)
+            }
+        )
+
         rvOrders.apply {
             layoutManager = LinearLayoutManager(this@YourOrderActivity)
             adapter = orderAdapter
@@ -136,6 +148,28 @@ class YourOrderActivity : AppCompatActivity() {
         }
     }
 
+    fun orderItemToCartItem(
+        orderItem: OrderItem,
+        item: Item
+    ): CartItem {
+        val customizations = mapOf(
+            "size" to orderItem.sizeChosen,
+            "temp" to orderItem.tempChosen,
+            "ice" to orderItem.iceLevel,
+            "sugar" to orderItem.sugarLevel,
+            "toppings" to orderItem.chosenToppings.joinToString(", ") { it.name },
+            "note" to orderItem.itemNote
+        )
+
+        val unitPrice = orderItem.finalUnitPrice
+
+        return CartItem(
+            item = item,
+            quantity = orderItem.quantity,
+            customizations = customizations,
+            price = unitPrice
+        )
+    }
     private fun selectOrderFilterButton(selectedButton: Button) {
         // Reset
         btnRecently.setBackgroundResource(R.color.backgroundLight)
@@ -191,5 +225,21 @@ class YourOrderActivity : AppCompatActivity() {
             tvEmptyOrders.visibility = View.GONE
             orderAdapter.updateOrders(list)
         }
+    }
+    private fun handleReorder(order: Order) {
+        if (order.status != "Delivered") return
+
+        CartManager.clearCart()
+
+        order.items.forEach { oi ->
+            val item = ItemRepository.getItemById(oi.productId) ?: return@forEach
+
+            val cartItem = orderItemToCartItem(oi, item)
+            CartManager.addItem(cartItem)
+        }
+
+        val intent = Intent(this, DrinkMenuActivity::class.java)
+        intent.putExtra("open_from_reorder", true)
+        startActivity(intent)
     }
 }

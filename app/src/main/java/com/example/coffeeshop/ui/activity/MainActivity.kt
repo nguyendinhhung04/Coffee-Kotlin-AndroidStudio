@@ -33,6 +33,7 @@ import com.example.coffeeshop.ui.adapter.PromotionAdapter
 import androidx.recyclerview.widget.PagerSnapHelper
 import android.os.Handler
 import android.os.Looper
+import com.example.coffeeshop.data.repo.ItemRepository
 
 
 class MainActivity : AppCompatActivity() {
@@ -230,18 +231,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadHomeContent() {
-        // B1: load toàn bộ items trước
         ItemDAO.getAllItems { success, msg, items ->
             runOnUiThread {
                 if (!success || items == null) {
                     Log.w("Main", "All items error: $msg")
-                    // vẫn gọi top-selling, nhưng sẽ không có giá
+                    // vẫn load các section khác nếu muốn
                     loadTopSellingSection()
                     loadPromotionSection()
                     return@runOnUiThread
                 }
+
+                // success & items != null
+                ItemRepository.setItems(items)  // items là List<Item>, ok
+
                 // cache map theo _id
                 allItemsMap = items.associateBy { it._id as String }
+
                 // sau khi có map rồi mới load top-selling + promotion
                 loadTopSellingSection()
                 loadPromotionSection()

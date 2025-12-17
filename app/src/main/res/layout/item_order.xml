@@ -5,12 +5,15 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
     app:cardCornerRadius="12dp"
+    app:cardUseCompatPadding="true"
+    app:cardElevation="2dp"
+    app:contentPadding="8dp"
     app:cardBackgroundColor="#F2EFEA">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="6dp">
 
         <ImageView
             android:id="@+id/ivOrderThumb"
@@ -22,6 +25,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- Tên order (món đầu tiên) -->
         <TextView
             android:id="@+id/tvOrderTitle"
             android:layout_width="0dp"
@@ -33,8 +37,10 @@
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/ivOrderThumb"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnOrderDetails" />
+            app:layout_constraintEnd_toStartOf="@id/llOrderActions"
+            app:layout_constraintHorizontal_bias="0" />
 
+        <!-- Dòng 1: thời gian -->
         <TextView
             android:id="@+id/tvOrderDate"
             android:layout_width="wrap_content"
@@ -46,18 +52,7 @@
             app:layout_constraintStart_toEndOf="@id/ivOrderThumb"
             app:layout_constraintTop_toBottomOf="@id/tvOrderTitle" />
 
-        <TextView
-            android:id="@+id/tvOrderStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Delivered"
-            android:textColor="@color/dark_brown"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toEndOf="@id/tvOrderDate"
-            app:layout_constraintTop_toBottomOf="@id/tvOrderTitle" />
-
+        <!-- Dòng 2: tổng tiền -->
         <TextView
             android:id="@+id/tvOrderTotal"
             android:layout_width="wrap_content"
@@ -70,17 +65,60 @@
             app:layout_constraintStart_toEndOf="@id/ivOrderThumb"
             app:layout_constraintTop_toBottomOf="@id/tvOrderDate" />
 
-        <Button
-            android:id="@+id/btnOrderDetails"
+        <!-- Dòng 3: trạng thái -->
+        <TextView
+            android:id="@+id/tvOrderStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Details"
+            android:text="Delivered"
             android:textColor="@color/dark_brown"
-            android:backgroundTint="@android:color/transparent"
-            android:padding="0dp"
-            android:minHeight="0dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginStart="12dp"
+            app:layout_constraintStart_toEndOf="@id/ivOrderThumb"
+            app:layout_constraintTop_toBottomOf="@id/tvOrderTotal" />
+
+        <!-- Nhóm 2 nút bên phải, chiếm full chiều cao item -->
+        <LinearLayout
+            android:id="@+id/llOrderActions"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:gravity="center_vertical|end"
+            android:layout_marginEnd="4dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <Button
+                android:id="@+id/btnOrderDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="Chi tiết"
+                android:textSize="12sp"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_order_secondary_button"
+                android:textColor="@color/dark_brown"
+                android:layout_marginBottom="6dp" />
+
+            <Button
+                android:id="@+id/btnReorder"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="Đặt lại"
+                android:textSize="12sp"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_order_primary_button"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
