@@ -18,8 +18,13 @@ class UserSessionManager(context: Context) {
         private const val KEY_PHONE = "phone"
         private const val KEY_TOKEN = "token"
         private const val KEY_LOYALTY_POINTS = "loyaltyPoints"
-
         private const val KEY_PASSWORD = "password"
+
+        private const val KEY_ADDRESS_STREET = "street"
+        private const val KEY_ADDRESS_WARD = "ward"
+        private const val KEY_ADDRESS_DISTRICT = "district"
+        private const val KEY_ADDRESS_CITY = "city"
+        private const val KEY_ROLE = "role"
 
     }
 
@@ -27,21 +32,37 @@ class UserSessionManager(context: Context) {
     fun saveUserSession(
         userId: String,
         username: String,
-        fullName: String?,
+        fullName: String,
+        password: String,
         email: String?,
         phone: String?,
-        token: String?,
-        password: String?
+        role: String?,
+        street: String?,
+        ward: String?,
+        district: String?,
+        city: String?,
+        token: String?
     ) {
         prefs.edit().apply {
             putBoolean(KEY_IS_LOGGED_IN, true)
+
             putString(KEY_USER_ID, userId)
             putString(KEY_USERNAME, username)
             putString(KEY_FULL_NAME, fullName)
+            putString(KEY_PASSWORD, password)
+
             putString(KEY_EMAIL, email)
             putString(KEY_PHONE, phone)
+            putString(KEY_ROLE, role)
+
+            // Address
+            putString(KEY_ADDRESS_STREET, street)
+            putString(KEY_ADDRESS_WARD, ward)
+            putString(KEY_ADDRESS_DISTRICT, district)
+            putString(KEY_ADDRESS_CITY, city)
+
             putString(KEY_TOKEN, token)
-            putString(KEY_PASSWORD, password)
+
             apply()
         }
     }
