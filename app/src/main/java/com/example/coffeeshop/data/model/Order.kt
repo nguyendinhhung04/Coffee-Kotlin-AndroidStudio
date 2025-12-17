@@ -40,8 +40,11 @@ data class Order(
     val taxes: Double,
     val totalAmount: Double,
     val deliveryAddress: DeliveryAddress,
-    val items: List<OrderItem>
-) : Serializable {
+    val items: List<OrderItem>,
+    val usedPointAmount: Number,
+    val discountByPointAmount: Number,
+
+    ) : Serializable {
     // Helper function để tính giá trị của từng item
     fun getItemTotal(index: Int): Double {
         return if (index in items.indices) items[index].finalUnitPrice * items[index].quantity else 0.0

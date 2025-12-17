@@ -18,6 +18,8 @@ class OrderDetailActivity : AppCompatActivity() {
     private lateinit var tvOrderStatus: TextView
     private lateinit var tvOrderTotal: TextView
     private lateinit var tvItemsSummary: TextView
+    private lateinit var tvUsedPoints: TextView
+    private lateinit var tvDiscountByPoints: TextView
 
     private lateinit var rgDeliveryMethod: RadioGroup
     private lateinit var rbPickup: RadioButton
@@ -57,6 +59,8 @@ class OrderDetailActivity : AppCompatActivity() {
         tvOrderStatus = findViewById(R.id.tvOrderStatusDetail)
         tvOrderTotal = findViewById(R.id.tvOrderTotalDetail)
         tvItemsSummary = findViewById(R.id.tvItemsSummary)
+        tvUsedPoints = findViewById(R.id.tvUsedPoints)
+        tvDiscountByPoints = findViewById(R.id.tvDiscountByPoints)
 
         rgDeliveryMethod = findViewById(R.id.rgDeliveryMethod)
         rbPickup = findViewById(R.id.rbPickup)
@@ -91,6 +95,14 @@ class OrderDetailActivity : AppCompatActivity() {
     private fun bindOrder(order: Order) {
         tvOrderId.text = "Order: ${order._id}"
         tvOrderStatus.text = "Status: ${order.status}"
+
+        if (order.usedPointAmount.toDouble() > 0) {
+            tvUsedPoints.visibility = View.VISIBLE
+            tvDiscountByPoints.visibility = View.VISIBLE
+            tvUsedPoints.text = "Điểm đã dùng: ${order.usedPointAmount}"
+            tvDiscountByPoints.text = "Giảm giá: -${formatter.format(order.discountByPointAmount)}"
+        }
+
         tvOrderTotal.text = "Total: ${formatter.format(order.totalAmount)}"
 
         // Items summary đơn giản

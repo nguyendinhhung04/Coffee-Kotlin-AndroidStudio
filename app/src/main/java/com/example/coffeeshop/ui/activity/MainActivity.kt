@@ -191,6 +191,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         loadUserInfo()
+        loadUserPoints()
         if (promoAdapter.itemCount > 0) {
             startPromoAutoSlide()
         }
@@ -200,15 +201,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadUserPoints() {
-        val session = UserSessionManager(this)
-        val userId = session.getUserId() ?: return
+//        val session = UserSessionManager(this)
+//        val userId = session.getUserId() ?: return
+        val userId = sessionManager.getUserId() ?: return
 
         PointsDAO.getUserPoints(userId) { success, message, points ->
             runOnUiThread {
                 if (success && points != null) {
                     tvPointsValue.text = "$points điểm"
+                    sessionManager.saveLoyaltyPoints(points)
                 } else {
                     tvPointsValue.text = "0 điểm"
+                    sessionManager.saveLoyaltyPoints(0)
                 }
             }
         }
