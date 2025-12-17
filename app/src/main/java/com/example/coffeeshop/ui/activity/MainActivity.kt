@@ -33,7 +33,9 @@ import com.example.coffeeshop.ui.adapter.PromotionAdapter
 import androidx.recyclerview.widget.PagerSnapHelper
 import android.os.Handler
 import android.os.Looper
-
+import androidx.cardview.widget.CardView
+import com.example.coffeeshop.data.repo.ItemRepository
+import com.example.coffeeshop.data.dao.PointsDAO
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,6 +65,8 @@ class MainActivity : AppCompatActivity() {
     private val recHandler = Handler(Looper.getMainLooper())
     private var recAutoScrollRunnable: Runnable? = null
 
+    private lateinit var cardPoints: CardView
+    private lateinit var tvPointsValue: TextView
 
 
     // launcher xin quyền thông báo
@@ -98,6 +102,18 @@ class MainActivity : AppCompatActivity() {
         tvBestSellerTitle = findViewById(R.id.tvBestSellerTitle)
         tvBestSellerSubtitle = findViewById(R.id.tvBestSellerSubtitle)
         ivBestSellerImage = findViewById(R.id.ivBestSellerImage)
+
+        //loyalty points
+        cardPoints = findViewById(R.id.cardPoints)
+        tvPointsValue = findViewById(R.id.tvPointsValue)
+
+        loadUserPoints()
+
+        cardPoints.setOnClickListener {
+            val intent = Intent(this, DrinkMenuActivity::class.java)
+            startActivity(intent)
+        }
+
 
         // ===== Recommendations =====
         rvRecommendations = findViewById(R.id.rvRecommendations)
@@ -183,6 +199,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadUserPoints() {
+        val session = UserSessionManager(this)
+        val userId = session.getUserId() ?: return
+
+        PointsDAO.getUserPoints(userId) { success, message, points ->
+            runOnUiThread {
+                if (success && points != null) {
+                    tvPointsValue.text = "$points điểm"
+                } else {
+                    tvPointsValue.text = "0 điểm"
+                }
+            }
+        }
+    }
+
     private fun startRecAutoSlide(intervalMs: Long = 4000L) {
         // huỷ runnable cũ nếu có
         recAutoScrollRunnable?.let { recHandler.removeCallbacks(it) }
@@ -230,18 +261,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadHomeContent() {
-        // B1: load toàn bộ items trước
         ItemDAO.getAllItems { success, msg, items ->
             runOnUiThread {
                 if (!success || items == null) {
                     Log.w("Main", "All items error: $msg")
-                    // vẫn gọi top-selling, nhưng sẽ không có giá
+                    // vẫn load các section khác nếu muốn
                     loadTopSellingSection()
                     loadPromotionSection()
                     return@runOnUiThread
                 }
+
+                // success & items != null
+                ItemRepository.setItems(items)  // items là List<Item>, ok
+
                 // cache map theo _id
                 allItemsMap = items.associateBy { it._id as String }
+
                 // sau khi có map rồi mới load top-selling + promotion
                 loadTopSellingSection()
                 loadPromotionSection()

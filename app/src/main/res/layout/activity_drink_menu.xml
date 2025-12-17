@@ -80,40 +80,43 @@
         <Button
             android:id="@+id/btnCoffee"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:text="Coffee"
             android:textColor="@color/white"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textAllCaps="false"
             android:backgroundTint="@color/brown"
             android:layout_marginEnd="8dp"
-            android:layout_gravity="center_vertical"/>
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"/>
 
         <Button
             android:id="@+id/btnChocolate"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:text="Chocolate"
             android:textColor="@color/dark_brown"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textAllCaps="false"
             android:backgroundTint="@color/backgroundLight"
             android:layout_marginEnd="8dp"
-            android:layout_gravity="center_vertical"/>
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"/>
 
         <Button
             android:id="@+id/btnOthers"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:text="Others"
             android:textColor="@color/dark_brown"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textAllCaps="false"
             android:backgroundTint="@color/backgroundLight"
-            android:layout_gravity="center_vertical"/>
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"/>
 
     </LinearLayout>
 

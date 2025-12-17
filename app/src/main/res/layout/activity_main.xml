@@ -7,187 +7,256 @@
     android:background="@color/creamy_white"
     tools:context=".ui.activity.MainActivity">
 
-    <!-- Top Bar -->
-    <TextView
-        android:id="@+id/tvGreeting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Good day, John Smith"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        android:fontFamily="@font/inter"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivBell"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_bell"
-        app:layout_constraintEnd_toStartOf="@+id/ivMenu"
+    <!-- Nội dung cuộn được -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/mainScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingBottom="72dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/dark_brown" />
-
-    <ImageView
-        android:id="@+id/ivMenu"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_menu"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/dark_brown" />
-
-    <!-- Best Seller Section -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvBestSeller"
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        app:cardBackgroundColor="@color/brown"
-        app:cardCornerRadius="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/tvGreeting"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp">
+            android:layout_height="wrap_content">
 
+            <!-- Top Bar -->
             <TextView
-                android:id="@+id/tvBestSellerLabel"
+                android:id="@+id/tvGreeting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Best seller of the week"
-                android:textColor="@color/white"
-                android:textSize="14sp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Good day, John Smith"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/inter"
+                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tvBestSellerTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Iced Coffee"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:fontFamily="@font/inter"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/ivBestSellerImage"
-                app:layout_constraintTop_toBottomOf="@+id/tvBestSellerLabel" />
-
-            <TextView
-                android:id="@+id/tvBestSellerSubtitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Sweet Heaven"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:fontFamily="@font/inter"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/ivBestSellerImage"
-                app:layout_constraintTop_toBottomOf="@+id/tvBestSellerTitle" />
-
+            <ImageView
+                android:id="@+id/ivBell"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_bell"
+                app:layout_constraintEnd_toStartOf="@+id/ivMenu"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/dark_brown" />
 
             <ImageView
-                android:id="@+id/ivBestSellerImage"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_marginStart="8dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/cocoa_beans"
-                app:layout_constraintStart_toEndOf="@id/tvBestSellerLabel"
+                android:id="@+id/ivMenu"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_menu"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:tint="@color/dark_brown" />
+
+            <!-- Points card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardPoints"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardUseCompatPadding="true"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFF3E0"
+                app:layout_constraintTop_toBottomOf="@+id/tvGreeting"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/tvPointsTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Điểm tích lũy của bạn"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        android:id="@+id/tvPointsValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 điểm"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/brown"
+                        android:layout_marginTop="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvPointsHint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mua để tích thêm điểm"
+                        android:textSize="13sp"
+                        android:textColor="@color/dark_brown"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Best Seller Section -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvBestSeller"
+                android:layout_width="0dp"
+                android:layout_height="180dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="16dp"
+                app:cardBackgroundColor="@color/brown"
+                app:cardCornerRadius="16dp"
+                app:layout_constraintTop_toBottomOf="@+id/cardPoints"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvBestSellerLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Best seller of the week"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvBestSellerTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Iced Coffee"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        android:fontFamily="@font/inter"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/ivBestSellerImage"
+                        app:layout_constraintTop_toBottomOf="@+id/tvBestSellerLabel" />
+
+                    <TextView
+                        android:id="@+id/tvBestSellerSubtitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Sweet Heaven"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
+                        android:fontFamily="@font/inter"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/ivBestSellerImage"
+                        app:layout_constraintTop_toBottomOf="@+id/tvBestSellerTitle" />
+
+                    <ImageView
+                        android:id="@+id/ivBestSellerImage"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_marginStart="8dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/cocoa_beans"
+                        app:layout_constraintStart_toEndOf="@id/tvBestSellerLabel"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- This week's recommendations -->
+            <TextView
+                android:id="@+id/tvRecommendationsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:text="This week's recommendations"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cvBestSeller" />
+
+            <TextView
+                android:id="@+id/tvSeeAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="See all"
+                android:textColor="@color/dark_brown"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvRecommendationsLabel"
+                app:layout_constraintBottom_toBottomOf="@+id/tvRecommendationsLabel" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRecommendations"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:overScrollMode="never"
+                app:layout_constraintTop_toBottomOf="@+id/tvRecommendationsLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <!-- What's in the shop? -->
+            <TextView
+                android:id="@+id/tvWhatsInShopLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:text="What's in the shop?"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rvRecommendations" />
+
+            <!-- Promotions slider -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPromotions"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:overScrollMode="never"
+                app:layout_constraintTop_toBottomOf="@+id/tvWhatsInShopLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+    </androidx.core.widget.NestedScrollView>
 
-    <!-- This week's recommendations -->
-    <TextView
-        android:id="@+id/tvRecommendationsLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:text="This week's recommendations"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cvBestSeller" />
-
-    <TextView
-        android:id="@+id/tvSeeAll"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="See all"
-        android:textColor="@color/dark_brown"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvRecommendationsLabel"
-        app:layout_constraintBottom_toBottomOf="@+id/tvRecommendationsLabel" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvRecommendations"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:overScrollMode="never"
-        app:layout_constraintTop_toBottomOf="@+id/tvRecommendationsLabel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- What's in the shop? -->
-    <TextView
-        android:id="@+id/tvWhatsInShopLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:text="What's in the shop?"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvRecommendations" />
-
-    <!-- Promotions slider -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPromotions"
-        android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:overScrollMode="never"
-        app:layout_constraintTop_toBottomOf="@+id/tvWhatsInShopLabel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Navigation Bar cố định dưới -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:background="@color/brown"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
