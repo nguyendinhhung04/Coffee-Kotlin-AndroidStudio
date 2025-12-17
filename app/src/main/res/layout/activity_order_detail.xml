@@ -30,6 +30,26 @@
             android:textColor="@color/dark_brown" />
 
         <TextView
+            android:id="@+id/tvUsedPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Điểm đã dùng"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/dark_brown"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvDiscountByPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Giảm giá bằng điểm"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/dark_brown"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/tvOrderTotalDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -23,6 +23,8 @@ object OrderDAO {
         shippingFee: Double,
         paymentMethod: String,
         note: String,
+        usedPointAmount: Double,
+        discountByPointAmount: Double,
         callback: (success: Boolean, message: String, orderId: String?) -> Unit
     ) {
         val json = JSONObject().apply {
@@ -35,7 +37,9 @@ object OrderDAO {
             put("discountAmount", discountAmount)
             put("shippingFee", shippingFee)
             put("taxes", 0.0)
-            put("totalAmount", subtotal + shippingFee - discountAmount)
+            put("usedPointAmount", usedPointAmount)
+            put("discountByPointAmount", discountByPointAmount)
+            put("totalAmount", subtotal + shippingFee - discountAmount - discountByPointAmount)
 
             // Địa chỉ giao hàng
             val addressObj = JSONObject().apply {
@@ -281,7 +285,9 @@ object OrderDAO {
             taxes = obj.optDouble("taxes", 0.0),
             totalAmount = obj.optDouble("totalAmount"),
             deliveryAddress = deliveryAddress,
-            items = items
+            items = items,
+            usedPointAmount = obj.optDouble("usedPointAmount", 0.0),
+            discountByPointAmount = obj.optDouble("discountByPointAmount", 0.0)
         )
     }
 
@@ -333,7 +339,9 @@ object OrderDAO {
                         chosenToppings = listOf(Topping("Shot Espresso Thêm", 12000.0)),
                         itemNote = "Nhiều kem tươi."
                     )
-                )
+                ),
+                usedPointAmount = 0.0,
+                discountByPointAmount = 0.0
             ),
             Order(
                 _id = "65b0e50f55e3a3c9e6d0a002",
@@ -368,7 +376,9 @@ object OrderDAO {
                         chosenToppings = emptyList(),
                         itemNote = "Ít ngọt."
                     )
-                )
+                ),
+                usedPointAmount = 0.0,
+                discountByPointAmount = 0.0
             ),
             Order(
                 _id = "65b0e50f55e3a3c9e6d0a003",
@@ -415,7 +425,9 @@ object OrderDAO {
                         chosenToppings = emptyList(),
                         itemNote = ""
                     )
-                )
+                ),
+                usedPointAmount = 0.0,
+                discountByPointAmount = 0.0
             )
         )
     }

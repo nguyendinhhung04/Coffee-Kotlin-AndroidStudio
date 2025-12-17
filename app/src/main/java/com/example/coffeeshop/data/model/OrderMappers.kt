@@ -29,7 +29,9 @@ data class OrderDTO(
     val taxes: Double,
     val totalAmount: Double,
     val deliveryAddress: Map<String, String>,
-    val items: List<OrderItemDTO>
+    val items: List<OrderItemDTO>,
+    val usedPointAmount: Int,
+    val discountByPointAmount: Double
 )
 
 fun buildOrderDTOFromCart(
@@ -37,14 +39,17 @@ fun buildOrderDTOFromCart(
     status: String = "Unpaid",
     paymentMethod: String = "COD",
     note: String? = null,
-    deliveryAddress: Map<String, String>
+    deliveryAddress: Map<String, String>,
+    usedPointAmount: Int = 0 ,
+    discountByPointAmount: Double = 0.0
 ): OrderDTO {
     val cartItems = CartManager.getAllItems()
     val subtotal = CartManager.getSubtotal()
     val discount = 0.0
     val shipping = 0.0
     val taxes = 0.0
-    val total = subtotal - discount + shipping + taxes
+    val total = subtotal - discount + shipping + taxes - discountByPointAmount
+
 
     val orderItems = cartItems.map { cartItem ->
         val c = cartItem.customizations
@@ -100,6 +105,8 @@ fun buildOrderDTOFromCart(
         taxes = taxes,
         totalAmount = total,
         deliveryAddress = deliveryAddress,
-        items = orderItems
+        items = orderItems,
+        usedPointAmount = usedPointAmount,
+        discountByPointAmount = discountByPointAmount
     )
 }

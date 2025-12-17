@@ -17,6 +17,7 @@ class UserSessionManager(context: Context) {
         private const val KEY_EMAIL = "email"
         private const val KEY_PHONE = "phone"
         private const val KEY_TOKEN = "token"
+        private const val KEY_LOYALTY_POINTS = "loyaltyPoints"
 
         private const val KEY_PASSWORD = "password"
 
@@ -98,5 +99,14 @@ class UserSessionManager(context: Context) {
 
     fun setPassword(newPassword: String) {
         prefs.edit().putString(KEY_PASSWORD, newPassword).apply()
+    }
+
+    // Functions for loyalty points
+    fun saveLoyaltyPoints(points: Int) {
+        prefs.edit().putInt(KEY_LOYALTY_POINTS, points).apply()
+    }
+
+    fun getLoyaltyPoints(): Int {
+        return prefs.getInt(KEY_LOYALTY_POINTS, 0)
     }
 }
