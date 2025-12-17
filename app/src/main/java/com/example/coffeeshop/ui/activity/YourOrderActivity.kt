@@ -247,8 +247,6 @@ class YourOrderActivity : AppCompatActivity() {
     private fun handleReorder(order: Order) {
         if (order.status != "Delivered") return
 
-        CartManager.clearCart()
-
         order.items.forEach { oi ->
             val item = ItemRepository.getItemById(oi.productId) ?: return@forEach
             val cartItem = orderItemToCartItem(oi, item)

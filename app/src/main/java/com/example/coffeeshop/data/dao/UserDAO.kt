@@ -67,13 +67,26 @@ object UserDAO {
         fullName: String,
         email: String,
         phone: String,
+        street: String?,
+        ward: String?,
+        district: String?,
+        city: String?,
+        isDefaultAddress: Boolean,
         callback: (success: Boolean, message: String) -> Unit
     ) {
         val json = JSONObject().apply {
             put("fullName", fullName)
             put("email", email)
             put("phone", phone)
-            // Do NOT put username because API says it cannot be changed
+
+            // Địa chỉ – gửi chuỗi rỗng nếu null để tránh null trong JSON
+            put("street", street ?: "")
+            put("ward", ward ?: "")
+            put("district", district ?: "")
+            put("city", city ?: "")
+
+            // Cờ địa chỉ nhận hàng mặc định
+            put("isDefaultAddress", isDefaultAddress)
         }
 
         val body = RequestBody.create(JSON_MEDIA_TYPE, json.toString())
@@ -103,6 +116,7 @@ object UserDAO {
             }
         })
     }
+
 
     fun changePassword(
         userId: String,

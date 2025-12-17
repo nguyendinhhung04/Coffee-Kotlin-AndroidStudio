@@ -25,6 +25,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.example.coffeeshop.data.dao.FavoriteDAO
 import com.example.coffeeshop.utils.NotificationConstants
 import com.example.coffeeshop.utils.UserSessionManager
+import android.widget.EditText
+import android.text.Editable
+import android.text.TextWatcher
+import com.example.coffeeshop.utils.unaccentLower
 
 class DrinkMenuActivity : AppCompatActivity() {
 
@@ -37,6 +41,10 @@ class DrinkMenuActivity : AppCompatActivity() {
     private lateinit var tvEmptyMessage: TextView
     private lateinit var tvCartBadge: TextView
     private lateinit var fabCart: FloatingActionButton
+
+    private lateinit var etSearch: EditText
+    private var allItems: List<Item> = emptyList()
+    private var displayedItems: List<Item> = emptyList()
 
     private lateinit var ivMenu: ImageView
 
@@ -70,6 +78,7 @@ class DrinkMenuActivity : AppCompatActivity() {
         setupFilterButtons()
         setupRecyclerView()
         setupCartButton()
+        setupSearchBar()
 
         // ===== Click Bar Menu & Notification =====
         ivMenu.setOnClickListener {
@@ -102,6 +111,7 @@ class DrinkMenuActivity : AppCompatActivity() {
         tvCartBadge = findViewById(R.id.tvCartBadge)
         fabCart = findViewById(R.id.fabCart)
         ivMenu = findViewById(R.id.ivDrinkMenuMenu)
+        etSearch = findViewById(R.id.etSearch)
 
         // Bind notification views
         layoutBell = findViewById(R.id.layoutBell)
@@ -236,17 +246,53 @@ class DrinkMenuActivity : AppCompatActivity() {
             runOnUiThread {
                 showLoading(false)
                 if (success && items != null) {
+                    allItems = items
+                    displayedItems = items
                     if (items.isEmpty()) {
                         showEmptyMessage(true)
                     } else {
                         showEmptyMessage(false)
-                        drinkAdapter.updateItems(items)
+                        drinkAdapter.updateItems(displayedItems)
                     }
                 } else {
                     showEmptyMessage(true)
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+    }
+
+    private fun setupSearchBar() {
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s?.toString()?.trim() ?: ""
+                filterDrinks(query)
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    private fun filterDrinks(query: String) {
+        val q = query.unaccentLower()
+
+        displayedItems = if (q.isBlank()) {
+            allItems
+        } else {
+            allItems.filter { item ->
+                item.name.unaccentLower().contains(q)
+            }
+        }
+
+        if (displayedItems.isEmpty()) {
+            tvEmptyMessage.visibility = View.VISIBLE
+            rvDrinkItems.visibility = View.GONE
+        } else {
+            tvEmptyMessage.visibility = View.GONE
+            rvDrinkItems.visibility = View.VISIBLE
+            drinkAdapter.updateItems(displayedItems)
         }
     }
 

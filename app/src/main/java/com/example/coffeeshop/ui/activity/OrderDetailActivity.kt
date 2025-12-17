@@ -8,6 +8,7 @@ import com.example.coffeeshop.R
 import com.example.coffeeshop.data.dao.OrderDAO
 import com.example.coffeeshop.data.model.DeliveryAddress
 import com.example.coffeeshop.data.model.Order
+import com.example.coffeeshop.utils.UserSessionManager
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,16 +33,17 @@ class OrderDetailActivity : AppCompatActivity() {
     private lateinit var etWard: EditText
     private lateinit var etDistrict: EditText
     private lateinit var etCity: EditText
-
     private lateinit var btnCancelOrder: Button
     private lateinit var btnConfirmOrder: Button
-
+    private lateinit var sessionManager: UserSessionManager
     private var currentOrder: Order? = null
     private val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_detail)
+
+        sessionManager = UserSessionManager(this)
 
         initViews()
         val orderId = intent.getStringExtra("order_id")
@@ -154,10 +156,33 @@ class OrderDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun fillDefaultAddressIfAny() {
+        // Chỉ auto-fill nếu user đã đánh dấu địa chỉ mặc định
+        if (!sessionManager.isDefaultAddress()) return
+
+        val fullName = sessionManager.getFullName().orEmpty()
+        val phone = sessionManager.getPhone().orEmpty()
+        val street = sessionManager.getStreet().orEmpty()
+        val ward = sessionManager.getWard().orEmpty()
+        val district = sessionManager.getDistrict().orEmpty()
+        val city = sessionManager.getCity().orEmpty()
+
+        // Nếu không có địa chỉ nào thì thôi
+        if (street.isBlank() && ward.isBlank() && district.isBlank() && city.isBlank()) return
+
+        etFullName.setText(fullName)
+        etPhone.setText(phone)
+        etStreet.setText(street)
+        etWard.setText(ward)
+        etDistrict.setText(district)
+        etCity.setText(city)
+    }
+
     private fun setupListeners() {
         rgDeliveryMethod.setOnCheckedChangeListener { _, checkedId ->
             if (checkedId == R.id.rbCod) {
                 layoutAddress.visibility = View.VISIBLE
+                fillDefaultAddressIfAny()   // <-- thêm dòng này
             } else {
                 layoutAddress.visibility = View.GONE
             }

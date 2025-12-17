@@ -2,6 +2,7 @@ package com.example.coffeeshop.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 class UserSessionManager(context: Context) {
 
@@ -25,10 +26,10 @@ class UserSessionManager(context: Context) {
         private const val KEY_ADDRESS_DISTRICT = "district"
         private const val KEY_ADDRESS_CITY = "city"
         private const val KEY_ROLE = "role"
-
+        private const val KEY_DEFAULT_ADDRESS = "defaultAddress"
     }
 
-    // Save session
+    // Save session (gọi sau login)
     fun saveUserSession(
         userId: String,
         username: String,
@@ -43,7 +44,7 @@ class UserSessionManager(context: Context) {
         city: String?,
         token: String?
     ) {
-        prefs.edit().apply {
+        prefs.edit {
             putBoolean(KEY_IS_LOGGED_IN, true)
 
             putString(KEY_USER_ID, userId)
@@ -62,8 +63,6 @@ class UserSessionManager(context: Context) {
             putString(KEY_ADDRESS_CITY, city)
 
             putString(KEY_TOKEN, token)
-
-            apply()
         }
     }
 
@@ -88,6 +87,30 @@ class UserSessionManager(context: Context) {
     fun getToken(): String? =
         prefs.getString(KEY_TOKEN, null)
 
+    fun getRole(): String? =
+        prefs.getString(KEY_ROLE, null)
+
+    // Default address flag
+    fun isDefaultAddress(): Boolean =
+        prefs.getBoolean(KEY_DEFAULT_ADDRESS, false)
+
+    fun setDefaultAddress(isDefault: Boolean) {
+        prefs.edit { putBoolean(KEY_DEFAULT_ADDRESS, isDefault) }
+    }
+
+    // Address getters
+    fun getStreet(): String? =
+        prefs.getString(KEY_ADDRESS_STREET, null)
+
+    fun getWard(): String? =
+        prefs.getString(KEY_ADDRESS_WARD, null)
+
+    fun getDistrict(): String? =
+        prefs.getString(KEY_ADDRESS_DISTRICT, null)
+
+    fun getCity(): String? =
+        prefs.getString(KEY_ADDRESS_CITY, null)
+
     fun clearSession() {
         prefs.edit().clear().apply()
     }
@@ -102,7 +125,7 @@ class UserSessionManager(context: Context) {
         }
     }
 
-    // NEW: setters for EditProfileActivity
+    // Setters cho EditProfileActivity
 
     fun setFullName(fullName: String) {
         prefs.edit().putString(KEY_FULL_NAME, fullName).apply()
@@ -116,13 +139,35 @@ class UserSessionManager(context: Context) {
         prefs.edit().putString(KEY_PHONE, phone).apply()
     }
 
-    fun getPassword(): String? = prefs.getString(KEY_PASSWORD, null)
+    fun getPassword(): String? =
+        prefs.getString(KEY_PASSWORD, null)
 
     fun setPassword(newPassword: String) {
         prefs.edit().putString(KEY_PASSWORD, newPassword).apply()
     }
 
-    // Functions for loyalty points
+    fun setRole(role: String?) {
+        prefs.edit().putString(KEY_ROLE, role).apply()
+    }
+
+    // Address setters
+    fun setStreet(street: String?) {
+        prefs.edit().putString(KEY_ADDRESS_STREET, street).apply()
+    }
+
+    fun setWard(ward: String?) {
+        prefs.edit().putString(KEY_ADDRESS_WARD, ward).apply()
+    }
+
+    fun setDistrict(district: String?) {
+        prefs.edit().putString(KEY_ADDRESS_DISTRICT, district).apply()
+    }
+
+    fun setCity(city: String?) {
+        prefs.edit().putString(KEY_ADDRESS_CITY, city).apply()
+    }
+
+    // Loyalty points
     fun saveLoyaltyPoints(points: Int) {
         prefs.edit().putInt(KEY_LOYALTY_POINTS, points).apply()
     }
