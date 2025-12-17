@@ -32,7 +32,6 @@ class OrderDetailActivity : AppCompatActivity() {
     private lateinit var etWard: EditText
     private lateinit var etDistrict: EditText
     private lateinit var etCity: EditText
-
     private lateinit var btnCancelOrder: Button
     private lateinit var btnConfirmOrder: Button
 
