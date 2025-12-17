@@ -59,7 +59,12 @@ class LoginFragment : Fragment() {
                     email = "$username@coffee.com",
                     phone = "",
                     token = "hardcoded_token",
-                    password = password
+                    password = password,
+                    role = "admin",
+                    street = "",
+                    ward = "",
+                    district = "",
+                    city = ""
                 )
 
                 Toast.makeText(requireContext(), "Login successful (Hardcoded)!", Toast.LENGTH_SHORT).show()
@@ -78,7 +83,12 @@ class LoginFragment : Fragment() {
                                     email = user.optString("email", ""),
                                     phone = user.optString("phone", ""),
                                     token = token,
-                                    password = password
+                                    password = password,
+                                    role = user.optString("role", ""),
+                                    street = user.optJSONObject("addresses")?.optString("street", ""),
+                                    ward = user.optJSONObject("addresses")?.optString("ward", ""),
+                                    district = user.optJSONObject("addresses")?.optString("district", ""),
+                                    city = user.optJSONObject("addresses")?.optString("city", "")
                                 )
                                 Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                                 navigateToMain()
