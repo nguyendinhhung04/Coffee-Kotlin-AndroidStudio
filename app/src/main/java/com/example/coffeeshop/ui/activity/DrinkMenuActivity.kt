@@ -57,9 +57,6 @@ class DrinkMenuActivity : AppCompatActivity() {
     private lateinit var drinkAdapter: DrinkItemAdapter
     private var currentCategory = "coffee"
 
-    private var cartBadgeCount = 0
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_drink_menu)
@@ -298,17 +295,6 @@ class DrinkMenuActivity : AppCompatActivity() {
                 Toast.makeText(this, "Cart is empty", Toast.LENGTH_SHORT).show()
             } else {
                 val cartFragment = CartBottomSheetFragment.newInstance()
-
-                // khi mở bottom sheet, sync badge một lần
-                cartFragment.setOnCartCountChangedListener { count ->
-                    if (count > 0) {
-                        tvCartBadge.visibility = View.VISIBLE
-                        tvCartBadge.text = count.toString()
-                    } else {
-                        tvCartBadge.visibility = View.GONE
-                    }
-                }
-
                 cartFragment.show(supportFragmentManager, "cart_bottom_sheet")
             }
         }
@@ -323,7 +309,6 @@ class DrinkMenuActivity : AppCompatActivity() {
             tvCartBadge.visibility = View.GONE
         }
     }
-
 
     override fun onResume() {
         super.onResume()

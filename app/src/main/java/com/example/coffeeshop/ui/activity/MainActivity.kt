@@ -1,41 +1,49 @@
 package com.example.coffeeshop.ui.activity
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.coffeeshop.R
 import com.example.coffeeshop.data.api.ApiClient
+import com.example.coffeeshop.data.dao.ItemDAO
+import com.example.coffeeshop.data.dao.PointsDAO
+import com.example.coffeeshop.data.dao.PromotionDAO
+import com.example.coffeeshop.data.model.CartItem
 import com.example.coffeeshop.data.model.Item
 import com.example.coffeeshop.data.model.Promotion
 import com.example.coffeeshop.data.models.FcmTokenRequest
+import com.example.coffeeshop.data.repo.ItemRepository
+import com.example.coffeeshop.ui.adapter.PromotionAdapter
+import com.example.coffeeshop.ui.adapter.RecommendationAdapter
+import com.example.coffeeshop.utils.CartManager
+import com.example.coffeeshop.utils.NotificationConstants
 import com.example.coffeeshop.utils.UserSessionManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.example.coffeeshop.data.dao.ItemDAO
-import com.example.coffeeshop.data.dao.PromotionDAO
-import com.example.coffeeshop.ui.adapter.RecommendationAdapter
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.coffeeshop.utils.CartManager
-import com.example.coffeeshop.data.model.CartItem
-import com.example.coffeeshop.ui.adapter.PromotionAdapter
-import androidx.recyclerview.widget.PagerSnapHelper
-import android.os.Handler
-import android.os.Looper
-import androidx.cardview.widget.CardView
-import com.example.coffeeshop.data.repo.ItemRepository
-import com.example.coffeeshop.data.dao.PointsDAO
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,9 +52,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
 
     private lateinit var ivMenu: ImageView
+    private lateinit var layoutBell: FrameLayout // FrameLayout bao ngoài chuông
     private lateinit var ivNotification: ImageView
+    private lateinit var viewNotificationDot: View // Chấm đỏ
 
-    // Best seller views
     // Best seller views
     private lateinit var tvBestSellerTitle: TextView
     private lateinit var tvBestSellerSubtitle: TextView
@@ -68,8 +77,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cardPoints: CardView
     private lateinit var tvPointsValue: TextView
 
+    // --- 1. RECEIVER LẮNG NGHE THÔNG BÁO MỚI ---
+    private val notificationReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            updateBellUI()
+        }
+    }
 
-    // launcher xin quyền thông báo
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -97,13 +111,17 @@ class MainActivity : AppCompatActivity() {
         tvGreeting = findViewById(R.id.tvGreeting)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
         ivMenu = findViewById(R.id.ivMenu)
+
+        // Khởi tạo phần Chuông thông báo mới
+        layoutBell = findViewById(R.id.layoutBell)
         ivNotification = findViewById(R.id.ivBell)
+        viewNotificationDot = findViewById(R.id.viewNotificationDot)
 
         tvBestSellerTitle = findViewById(R.id.tvBestSellerTitle)
         tvBestSellerSubtitle = findViewById(R.id.tvBestSellerSubtitle)
         ivBestSellerImage = findViewById(R.id.ivBestSellerImage)
 
-        //loyalty points
+        // loyalty points
         cardPoints = findViewById(R.id.cardPoints)
         tvPointsValue = findViewById(R.id.tvPointsValue)
 
@@ -113,7 +131,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, DrinkMenuActivity::class.java)
             startActivity(intent)
         }
-
 
         // ===== Recommendations =====
         rvRecommendations = findViewById(R.id.rvRecommendations)
@@ -132,34 +149,16 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         rvRecommendations.apply {
-            layoutManager = LinearLayoutManager(
-                this@MainActivity,
-                LinearLayoutManager.HORIZONTAL,
-                false
-            )
+            layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
             adapter = recAdapter
         }
-
-        rvRecommendations.apply {
-            layoutManager = LinearLayoutManager(
-                this@MainActivity,
-                LinearLayoutManager.HORIZONTAL,
-                false
-            )
-            adapter = recAdapter
-        }
-
-//        val recSnapHelper = PagerSnapHelper()
-//        recSnapHelper.attachToRecyclerView(rvRecommendations)
 
         // ===== Promotions slider =====
         rvPromotions = findViewById(R.id.rvPromotions)
         promoAdapter = PromotionAdapter(emptyList()) { promo: Promotion ->
-            // ví dụ: mở màn Order hoặc chi tiết promotion
             startActivity(Intent(this, YourOrderActivity::class.java))
         }
-        rvPromotions.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        rvPromotions.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvPromotions.adapter = promoAdapter
 
         val snapHelper = PagerSnapHelper()
@@ -170,7 +169,14 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
-        ivNotification.setOnClickListener {
+        // --- 2. CLICK CHUÔNG: TẮT HIỆU ỨNG VÀ MỞ MÀN HÌNH ---
+        layoutBell.setOnClickListener {
+            // Reset trạng thái chưa đọc
+            val prefs = getSharedPreferences(NotificationConstants.PREF_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putBoolean(NotificationConstants.KEY_HAS_UNREAD, false).apply()
+
+            updateBellUI() // Cập nhật ngay UI (ẩn chấm đỏ, tắt rung)
+
             startActivity(Intent(this, NotificationActivity::class.java))
         }
 
@@ -181,6 +187,35 @@ class MainActivity : AppCompatActivity() {
         loadHomeContent()
     }
 
+    // --- 3. HÀM CẬP NHẬT GIAO DIỆN CHUÔNG (CHẤM ĐỎ + RUNG) ---
+    private fun updateBellUI() {
+        val prefs = getSharedPreferences(NotificationConstants.PREF_NAME, Context.MODE_PRIVATE)
+        val hasUnread = prefs.getBoolean(NotificationConstants.KEY_HAS_UNREAD, false)
+
+        if (hasUnread) {
+            viewNotificationDot.visibility = View.VISIBLE
+            val anim = AnimationUtils.loadAnimation(this, R.anim.bell_shake)
+            anim.repeatCount = 10
+            ivNotification.startAnimation(anim)
+        } else {
+            viewNotificationDot.visibility = View.GONE
+            ivNotification.clearAnimation()
+        }
+    }
+
+    // --- 4. ĐĂNG KÝ/HỦY RECEIVER ---
+    override fun onStart() {
+        super.onStart()
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            notificationReceiver,
+            IntentFilter(NotificationConstants.ACTION_NEW_ORDER)
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationReceiver)
+    }
 
     override fun onPause() {
         super.onPause()
@@ -192,19 +227,14 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         loadUserInfo()
         loadUserPoints()
-        if (promoAdapter.itemCount > 0) {
-            startPromoAutoSlide()
-        }
-        if (recAdapter.itemCount > 0) {
-            startRecAutoSlide()
-        }
+        updateBellUI() // Kiểm tra trạng thái chuông mỗi khi quay lại màn hình
+
+        if (promoAdapter.itemCount > 0) startPromoAutoSlide()
+        if (recAdapter.itemCount > 0) startRecAutoSlide()
     }
 
     private fun loadUserPoints() {
-//        val session = UserSessionManager(this)
-//        val userId = session.getUserId() ?: return
         val userId = sessionManager.getUserId() ?: return
-
         PointsDAO.getUserPoints(userId) { success, message, points ->
             runOnUiThread {
                 if (success && points != null) {
@@ -219,45 +249,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startRecAutoSlide(intervalMs: Long = 4000L) {
-        // huỷ runnable cũ nếu có
         recAutoScrollRunnable?.let { recHandler.removeCallbacks(it) }
-
-
         recAutoScrollRunnable = object : Runnable {
             override fun run() {
                 val lm = rvRecommendations.layoutManager as? LinearLayoutManager ?: return
                 val itemCount = recAdapter.itemCount
                 if (itemCount == 0) return
-
                 val current = lm.findFirstCompletelyVisibleItemPosition()
                 val safeCurrent = if (current == RecyclerView.NO_POSITION) 0 else current
                 val next = (safeCurrent + 1) % itemCount
-                Log.d("Main", "Rec auto tick: count=$itemCount current=$current next=$next")
                 rvRecommendations.scrollToPosition(next)
-
-
-                // DÒNG NÀY RẤT QUAN TRỌNG, nếu thiếu sẽ chỉ chạy 1 lần
                 recHandler.postDelayed(this, intervalMs)
             }
         }
         recHandler.postDelayed(recAutoScrollRunnable!!, intervalMs)
-
     }
 
     private fun startPromoAutoSlide(intervalMs: Long = 3000L) {
-        // huỷ cũ nếu có
         promoAutoScrollRunnable?.let { promoHandler.removeCallbacks(it) }
-
         promoAutoScrollRunnable = object : Runnable {
             override fun run() {
                 val lm = rvPromotions.layoutManager as? LinearLayoutManager ?: return
                 val itemCount = promoAdapter.itemCount
                 if (itemCount == 0) return
-
                 val current = lm.findFirstVisibleItemPosition()
                 val next = (current + 1) % itemCount
                 rvPromotions.smoothScrollToPosition(next)
-
                 promoHandler.postDelayed(this, intervalMs)
             }
         }
@@ -268,20 +285,12 @@ class MainActivity : AppCompatActivity() {
         ItemDAO.getAllItems { success, msg, items ->
             runOnUiThread {
                 if (!success || items == null) {
-                    Log.w("Main", "All items error: $msg")
-                    // vẫn load các section khác nếu muốn
                     loadTopSellingSection()
                     loadPromotionSection()
                     return@runOnUiThread
                 }
-
-                // success & items != null
-                ItemRepository.setItems(items)  // items là List<Item>, ok
-
-                // cache map theo _id
+                ItemRepository.setItems(items)
                 allItemsMap = items.associateBy { it._id as String }
-
-                // sau khi có map rồi mới load top-selling + promotion
                 loadTopSellingSection()
                 loadPromotionSection()
             }
@@ -291,64 +300,33 @@ class MainActivity : AppCompatActivity() {
     private fun loadTopSellingSection() {
         ItemDAO.getTopSellingItems { success, msg, topItems ->
             runOnUiThread {
-                Log.d("Main", "topSelling success=$success size=${topItems?.size} msg=$msg")
-                if (!success || topItems == null || topItems.isEmpty()) {
-                    Log.w("Main", "Top selling error: $msg")
-                    return@runOnUiThread
-                }
-
-                // map từng top item sang bản đầy đủ nếu có
-                val enriched = topItems.map { top ->
-                    allItemsMap[top._id] ?: top   // nếu không có thì dùng bản đơn giản
-                }
-
-                // best seller = item đầu
+                if (!success || topItems.isNullOrEmpty()) return@runOnUiThread
+                val enriched = topItems.map { allItemsMap[it._id] ?: it }
                 val best = enriched[0]
                 tvBestSellerTitle.text = best.name
-                tvBestSellerSubtitle.text =
-                    if (best.category.isNotBlank())
-                        best.category.replaceFirstChar { it.uppercase() }
-                    else
-                        "Best seller"
+                tvBestSellerSubtitle.text = if (best.category.isNotBlank()) best.category.replaceFirstChar { it.uppercase() } else "Best seller"
                 loadItemImage(best.image_url, ivBestSellerImage)
-
-                // recommendations = top 5
-                val recList = enriched.take(5)
-                recAdapter.update(recList)
-
+                recAdapter.update(enriched.take(5))
                 startRecAutoSlide()
             }
         }
     }
 
-
-
     private fun loadPromotionSection() {
         PromotionDAO.getActivePromotions { success, msg, promos ->
             runOnUiThread {
-                if (!success || promos == null || promos.isEmpty()) {
-                    Log.w("Main", "Promotions error: $msg")
-                    return@runOnUiThread
+                if (success && !promos.isNullOrEmpty()) {
+                    promoAdapter.update(promos)
+                    startPromoAutoSlide()
                 }
-                promoAdapter.update(promos)
-                startPromoAutoSlide()
             }
         }
     }
 
-
-    // ====== Notification permission ======
-
     private fun askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 sessionManager.getUserId()?.let { saveFcmToken(it) }
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
@@ -357,11 +335,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ====== UI logic ======
-
     private fun loadUserInfo() {
-        val displayName = sessionManager.getDisplayName()
-        tvGreeting.text = "Good day, $displayName"
+        tvGreeting.text = "Good day, ${sessionManager.getDisplayName()}"
     }
 
     private fun setupBottomNavigation() {
@@ -389,10 +364,6 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.selectedItemId = R.id.navigation_home
     }
 
-    // ====== Call APIs for home content ======
-
-    // ====== Helpers ======
-
     private fun loadItemImage(imageName: String, imageView: ImageView) {
         try {
             val inputStream = assets.open("item_img/$imageName")
@@ -404,11 +375,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun formatPrice(price: Double): String {
-        val nf = java.text.NumberFormat.getCurrencyInstance(java.util.Locale("vi", "VN"))
-        return nf.format(price)
-    }
-
     private fun navigateToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -418,23 +384,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveFcmToken(userId: String) {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
-                return@addOnCompleteListener
-            }
+            if (!task.isSuccessful) return@addOnCompleteListener
             val deviceToken = task.result
             val request = FcmTokenRequest(userId = userId, deviceToken = deviceToken)
             ApiClient.fcmApi.saveToken(request).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    if (response.isSuccessful) {
-                        Log.d("FCM", "Token saved successfully")
-                    } else {
-                        Log.e("FCM", "Failed to save token: ${response.code()}")
-                    }
-                }
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    Log.e("FCM", "Failed to save token", t)
-                }
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {}
+                override fun onFailure(call: Call<Void>, t: Throwable) {}
             })
         }
     }

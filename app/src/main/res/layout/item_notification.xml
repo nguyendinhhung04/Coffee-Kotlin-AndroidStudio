@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Notification Icon -->
         <ImageView
             android:id="@+id/ivNotificationIcon"
             android:layout_width="40dp"
@@ -30,7 +29,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Notification Title -->
         <TextView
             android:id="@+id/textViewNotificationTitle"
             android:layout_width="0dp"
@@ -48,7 +46,6 @@
             app:layout_constraintTop_toTopOf="@+id/ivNotificationIcon"
             tools:text="Your order is ready!" />
 
-        <!-- Notification Body -->
         <TextView
             android:id="@+id/textViewNotificationBody"
             android:layout_width="0dp"
@@ -66,7 +63,6 @@
             app:layout_constraintTop_toBottomOf="@+id/textViewNotificationTitle"
             tools:text="Your Coffee Latte is ready for pickup. Please collect it from the counter." />
 
-        <!-- Notification Date/Time -->
         <TextView
             android:id="@+id/textViewNotificationDate"
             android:layout_width="0dp"
@@ -80,7 +76,6 @@
             app:layout_constraintTop_toBottomOf="@+id/textViewNotificationBody"
             tools:text="2 hours ago" />
 
-        <!-- Unread Indicator -->
         <View
             android:id="@+id/viewUnreadIndicator"
             android:layout_width="8dp"
@@ -93,5 +88,4 @@
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.cardview.widget.CardView>
