@@ -49,6 +49,8 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
     private var usedPointAmount = 0
     private var discountByPointAmount = 0.0
 
+    private var onCartCountChanged: ((Int) -> Unit)? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -122,6 +124,10 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
+    fun setOnCartCountChangedListener(listener: (Int) -> Unit) {
+        onCartCountChanged = listener
+    }
+
     private fun initViews(view: View) {
         rvCartItems = view.findViewById(R.id.rvCartItems)
         tvSubtotal = view.findViewById(R.id.tvSubtotal)
@@ -180,6 +186,10 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
         val subtotal = CartManager.getSubtotal()
         val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
 
+        // tổng số lượng trong giỏ
+        val totalCount = items.sumOf { it.quantity }
+        onCartCountChanged?.invoke(totalCount)
+
         if (items.isEmpty()) {
             tvEmptyCart.visibility = View.VISIBLE
             rvCartItems.visibility = View.GONE
@@ -197,6 +207,7 @@ class CartBottomSheetFragment : BottomSheetDialogFragment() {
             calculateTotal(subtotal)
         }
     }
+
 
     private fun setupPointsSystem() {
         val availablePoints = sessionManager.getLoyaltyPoints()
