@@ -205,6 +205,52 @@ object OrderDAO {
         })
     }
 
+    // 🟡 UPDATE - Cập nhật thông tin order đầy đủ (Address + ShippingFee + PaymentMethod)
+    fun updateOrderFull(
+        orderId: String,
+        status: String,
+        deliveryAddress: DeliveryAddress,
+        paymentMethod: String,
+        shippingFee: Double,
+        callback: (success: Boolean, message: String) -> Unit
+    ) {
+        val json = JSONObject().apply {
+            put("status", status)
+            put("paymentMethod", paymentMethod)
+            put("shippingFee", shippingFee)
+
+            val addressObj = JSONObject().apply {
+                put("fullName", deliveryAddress.fullName)
+                put("phone", deliveryAddress.phone)
+                put("street", deliveryAddress.street)
+                put("ward", deliveryAddress.ward)
+                put("district", deliveryAddress.district)
+                put("city", deliveryAddress.city)
+            }
+            put("deliveryAddress", addressObj)
+        }
+
+        val body = json.toString().toRequestBody(JSON_MEDIA_TYPE)
+        val request = Request.Builder()
+            .url("$BASE_URL/orders/$orderId")
+            .put(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback(false, "Lỗi mạng: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    callback(true, "Cập nhật thành công")
+                } else {
+                    callback(false, "Lỗi server: ${response.code}")
+                }
+            }
+        })
+    }
+
     // 🔴 DELETE - Hủy đơn hàng
     fun cancelOrder(
         orderId: String,

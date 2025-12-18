@@ -107,9 +107,8 @@ class OrderDetailActivity : AppCompatActivity() {
 
         tvOrderTotal.text = "Total: ${formatter.format(order.totalAmount)}"
 
-        // Items summary đơn giản
+        // Items summary
         val itemsText = buildString {
-            // order.orderDate là chuỗi ISO: 2025-12-03T08:19:08.423Z
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
             val outputFormat = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
@@ -128,9 +127,10 @@ class OrderDetailActivity : AppCompatActivity() {
         }
         tvItemsSummary.text = itemsText
 
-        // Nếu địa chỉ trống -> mặc định coi là pickup
+        // Logic hiển thị địa chỉ và phương thức giao hàng
         val addr: DeliveryAddress? = order.deliveryAddress
         val hasAddress = addr != null && !addr.street.isNullOrBlank()
+
         if (hasAddress) {
             rbCod.isChecked = true
             layoutAddress.visibility = View.VISIBLE
@@ -145,8 +145,24 @@ class OrderDetailActivity : AppCompatActivity() {
             layoutAddress.visibility = View.GONE
         }
 
-        // Ẩn/hiện nút hủy theo trạng thái
-        val blocked = listOf("Confirmed", "Delivering", "Delivered")
+        // --- LOGIC MỚI: Chỉ cho phép chỉnh sửa nếu đơn là Pending ---
+        val isPending = (order.status == "Pending")
+
+        // 1. Chặn chọn phương thức giao hàng
+        rbPickup.isEnabled = isPending
+        rbCod.isEnabled = isPending
+
+        // 2. Chặn sửa text địa chỉ (tùy chọn, nên có để nhất quán)
+        etFullName.isEnabled = isPending
+        etPhone.isEnabled = isPending
+        etStreet.isEnabled = isPending
+        etWard.isEnabled = isPending
+        etDistrict.isEnabled = isPending
+        etCity.isEnabled = isPending
+        // -----------------------------------------------------------
+
+        // Ẩn/hiện nút hủy/xác nhận theo trạng thái
+        val blocked = listOf("Confirmed", "Delivering", "Delivered", "Cancelled")
         if (blocked.contains(order.status)) {
             btnCancelOrder.visibility = View.GONE
             btnConfirmOrder.visibility = View.GONE
@@ -230,11 +246,26 @@ class OrderDetailActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
 
-                // Ở đây bạn cần có API update đầy đủ order (address + shippingFee + paymentMethod)
-                // Hiện tại OrderDAO.updateOrderStatus chỉ update được status.
-                // Tối thiểu: set status = Confirmed, và bạn xử lý +15k phí ship ở backend.
+                val deliveryAddress = DeliveryAddress(
+                    fullName = etFullName.text.toString(),
+                    phone = etPhone.text.toString(),
+                    street = etStreet.text.toString(),
+                    ward = etWard.text.toString(),
+                    district = etDistrict.text.toString(),
+                    city = etCity.text.toString()
+                )
+
                 val orderId = order._id ?: return@setOnClickListener
-                OrderDAO.updateOrderStatus(orderId, "Confirmed") { success, message ->
+                val shippingFee = 15000.0 // Phí ship cố định cho COD như yêu cầu
+                val paymentMethod = "COD"
+
+                OrderDAO.updateOrderFull(
+                    orderId,
+                    "Confirmed",
+                    deliveryAddress,
+                    paymentMethod,
+                    shippingFee
+                ) { success, message ->
                     runOnUiThread {
                         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                         if (success) {
