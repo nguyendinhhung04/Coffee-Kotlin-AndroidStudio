@@ -1,251 +1,279 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="🛒 Giỏ Hàng"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/brown"
-        android:layout_marginBottom="16dp" />
-
-    <TextView
-        android:id="@+id/tvEmptyCart"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Giỏ hàng trống"
-        android:textAlignment="center"
-        android:textColor="@color/gray"
-        android:padding="32dp"
-        android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCartItems"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxHeight="400dp"
-        android:layout_marginBottom="16dp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/lightGray"
-        android:layout_marginBottom="12dp" />
-
+    <!-- Nội dung chính: tiêu đề + list + điểm + tổng -->
     <LinearLayout
+        android:id="@+id/contentContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="8dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/white">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Tạm tính:"
-            android:textSize="14sp"
-            android:textColor="@color/dark_brown" />
-
-        <TextView
-            android:id="@+id/tvSubtotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0 VND"
-            android:textSize="14sp"
+            android:text="🛒 Giỏ Hàng"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@color/brown" />
-    </LinearLayout>
+            android:textColor="@color/brown"
+            android:layout_marginBottom="16dp" />
 
-    <LinearLayout
-        android:id="@+id/llPointsSection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        <!-- Phần cuộn được -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvEmptyCart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Giỏ hàng trống"
+                    android:textAlignment="center"
+                    android:textColor="@color/gray"
+                    android:padding="32dp"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCartItems"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/lightGray"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Tạm tính -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Tạm tính:"
+                        android:textSize="14sp"
+                        android:textColor="@color/dark_brown" />
+
+                    <TextView
+                        android:id="@+id/tvSubtotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 VND"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/brown" />
+                </LinearLayout>
+
+                <!-- Phần điểm + giảm giá -->
+                <LinearLayout
+                    android:id="@+id/llPointsSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="4dp">
+
+                        <CheckBox
+                            android:id="@+id/cbUsePoints"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tvAvailablePoints"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Sử dụng điểm (hiện có: 0)"
+                            android:textColor="@color/dark_brown"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llInputPoints"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:visibility="gone"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dùng:"
+                            android:textColor="@color/dark_brown"
+                            android:textSize="14sp"
+                            android:layout_marginEnd="8dp" />
+
+                        <Button
+                            android:id="@+id/btnMinusPoint"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="-"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/white"
+                            android:backgroundTint="@color/brown"
+                            android:padding="0dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:layout_marginEnd="4dp" />
+
+                        <EditText
+                            android:id="@+id/etPointsToUse"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:textAlignment="center"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_brown"
+                            android:hint="0" />
+
+                        <Button
+                            android:id="@+id/btnPlusPoint"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="+"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/white"
+                            android:backgroundTint="@color/brown"
+                            android:padding="0dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:layout_marginStart="4dp" />
+
+                        <TextView
+                            android:id="@+id/tvMaxPointsHint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="/ 0 điểm"
+                            android:textColor="@color/gray"
+                            android:textSize="14sp"
+                            android:layout_marginStart="8dp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvPointConversionRate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="(1 điểm = 10.000đ)"
+                        android:textSize="12sp"
+                        android:textColor="@color/gray"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/llDiscount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Giảm giá bằng điểm:"
+                            android:textColor="@color/green"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tvDiscountAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-0 VND"
+                            android:textStyle="bold"
+                            android:textColor="@color/green"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Tổng cộng -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_pricing"
+                    android:padding="12dp"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Tổng cộng:"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/dark_brown" />
+
+                    <TextView
+                        android:id="@+id/tvTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 VND"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/brown" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- FOOTER cố định: nút Xóa + Thanh toán luôn dính đáy -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:layout_marginBottom="4dp">
-
-            <CheckBox
-                android:id="@+id/cbUsePoints"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:id="@+id/tvAvailablePoints"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Sử dụng điểm (hiện có: 0)"
-                android:textColor="@color/dark_brown"
-                android:textSize="14sp"/>
-        </LinearLayout>
-        
-        <LinearLayout
-            android:id="@+id/llInputPoints"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:visibility="gone"
-            android:layout_marginStart="32dp"
-            android:layout_marginBottom="8dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dùng:"
-                android:textColor="@color/dark_brown"
-                android:textSize="14sp"
-                android:layout_marginEnd="8dp"/>
+            android:layout_marginTop="12dp">
 
             <Button
-                android:id="@+id/btnMinusPoint"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="-"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:id="@+id/btnClear"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="Xóa"
                 android:textColor="@color/white"
-                android:backgroundTint="@color/brown"
-                android:padding="0dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:layout_marginEnd="4dp"/>
-
-            <EditText
-                android:id="@+id/etPointsToUse"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:textAlignment="center"
                 android:textSize="14sp"
-                android:textColor="@color/dark_brown"
-                android:hint="0"/>
+                android:backgroundTint="@color/red"
+                android:layout_marginEnd="8dp" />
 
             <Button
-                android:id="@+id/btnPlusPoint"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="+"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/brown"
-                android:padding="0dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:layout_marginStart="4dp"/>
-
-            <TextView
-                android:id="@+id/tvMaxPointsHint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="/ 0 điểm"
-                android:textColor="@color/gray"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp"/>
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvPointConversionRate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="(1 điểm = 10.000đ)"
-            android:textSize="12sp"
-            android:textColor="@color/gray"
-            android:layout_marginStart="32dp"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone"/>
-
-        <LinearLayout
-            android:id="@+id/llDiscount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone">
-
-            <TextView
+                android:id="@+id/btnCheckout"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_weight="1"
-                android:text="Giảm giá bằng điểm:"
-                android:textColor="@color/green"
-                android:textSize="14sp"/>
-
-            <TextView
-                android:id="@+id/tvDiscountAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="-0 VND"
+                android:text="Thanh Toán"
+                android:textColor="@color/white"
+                android:textSize="14sp"
                 android:textStyle="bold"
-                android:textColor="@color/green"
-                android:textSize="14sp"/>
+                android:backgroundTint="@color/green" />
         </LinearLayout>
+
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/bg_pricing"
-        android:padding="12dp"
-        android:layout_marginBottom="16dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Tổng cộng:"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="@color/dark_brown" />
-
-        <TextView
-            android:id="@+id/tvTotal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0 VND"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="@color/brown" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnClear"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:text="Xóa"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:backgroundTint="@color/red"
-            android:layout_marginEnd="8dp" />
-
-        <Button
-            android:id="@+id/btnCheckout"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:text="Thanh Toán"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:backgroundTint="@color/green" />
-    </LinearLayout>
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
