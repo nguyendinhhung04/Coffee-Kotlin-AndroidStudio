@@ -1,30 +1,31 @@
 package com.example.coffeeshop.ui.activity
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.view.animation.AnimationUtils
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.coffeeshop.R
 import com.example.coffeeshop.data.dao.ItemDAO
 import com.example.coffeeshop.data.model.Item
 import com.example.coffeeshop.data.model.CartItem
-import com.example.coffeeshop.ui.adapter.DrinkItemAdapter   // <-- use DrinkItemAdapter
+import com.example.coffeeshop.ui.adapter.DrinkItemAdapter
 import com.example.coffeeshop.ui.fragment.CartBottomSheetFragment
 import com.example.coffeeshop.utils.CartManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import android.widget.ImageView
 import com.example.coffeeshop.data.dao.FavoriteDAO
-import com.example.coffeeshop.ui.activity.SettingsActivity
+import com.example.coffeeshop.utils.NotificationConstants
 import com.example.coffeeshop.utils.UserSessionManager
+import android.widget.EditText
 import android.text.Editable
 import android.text.TextWatcher
 import com.example.coffeeshop.utils.unaccentLower
@@ -41,21 +42,30 @@ class DrinkMenuActivity : AppCompatActivity() {
     private lateinit var tvCartBadge: TextView
     private lateinit var fabCart: FloatingActionButton
 
+    private lateinit var etSearch: EditText
+    private var allItems: List<Item> = emptyList()
+    private var displayedItems: List<Item> = emptyList()
+
     private lateinit var ivMenu: ImageView
 
+    // Notification components
+    private lateinit var layoutBell: FrameLayout
     private lateinit var ivNotification: ImageView
+    private lateinit var viewNotificationDot: View
 
     private lateinit var sessionManager: UserSessionManager
     private val favoriteIds = mutableSetOf<String>()
 
-
-
-    private lateinit var etSearch: EditText
-    private var allItems: List<Item> = emptyList()
-    private var displayedItems: List<Item> = emptyList()
-    // Adapter for menu list = Item
+    // Adapter for menu list
     private lateinit var drinkAdapter: DrinkItemAdapter
     private var currentCategory = "coffee"
+
+    // --- 1. RECEIVER LẮNG NGHE THÔNG BÁO MỚI ---
+    private val notificationReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            updateBellUI()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,16 +80,19 @@ class DrinkMenuActivity : AppCompatActivity() {
         setupCartButton()
         setupSearchBar()
 
-
-        ivMenu = findViewById(R.id.ivDrinkMenuMenu)
-        ivNotification = findViewById(R.id.ivBell)
-
+        // ===== Click Bar Menu & Notification =====
         ivMenu.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
-        ivNotification.setOnClickListener {
+        // Click vào cụm chuông: Tắt hiệu ứng và mở màn hình thông báo
+        layoutBell.setOnClickListener {
+            val prefs = getSharedPreferences(NotificationConstants.PREF_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putBoolean(NotificationConstants.KEY_HAS_UNREAD, false).apply()
+
+            updateBellUI() // Cập nhật UI ngay lập tức
+
             val intent = Intent(this, NotificationActivity::class.java)
             startActivity(intent)
         }
@@ -97,8 +110,29 @@ class DrinkMenuActivity : AppCompatActivity() {
         tvEmptyMessage = findViewById(R.id.tvEmptyMessage)
         tvCartBadge = findViewById(R.id.tvCartBadge)
         fabCart = findViewById(R.id.fabCart)
+        ivMenu = findViewById(R.id.ivDrinkMenuMenu)
         etSearch = findViewById(R.id.etSearch)
 
+        // Bind notification views
+        layoutBell = findViewById(R.id.layoutBell)
+        ivNotification = findViewById(R.id.ivBell)
+        viewNotificationDot = findViewById(R.id.viewNotificationDot)
+    }
+
+    // --- 2. HÀM CẬP NHẬT GIAO DIỆN CHUÔNG (RUNG + CHẤM ĐỎ) ---
+    private fun updateBellUI() {
+        val prefs = getSharedPreferences(NotificationConstants.PREF_NAME, Context.MODE_PRIVATE)
+        val hasUnread = prefs.getBoolean(NotificationConstants.KEY_HAS_UNREAD, false)
+
+        if (hasUnread) {
+            viewNotificationDot.visibility = View.VISIBLE
+            val anim = AnimationUtils.loadAnimation(this, R.anim.bell_shake)
+            anim.repeatCount = 10
+            ivNotification.startAnimation(anim)
+        } else {
+            viewNotificationDot.visibility = View.GONE
+            ivNotification.clearAnimation()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -110,7 +144,7 @@ class DrinkMenuActivity : AppCompatActivity() {
             onFavoriteClick = { item ->
                 toggleFavorite(item)
             },
-            favoriteIds = favoriteIds   // nếu adapter có param này, xem bước 3
+            favoriteIds = favoriteIds
         )
 
         rvDrinkItems.apply {
@@ -129,10 +163,8 @@ class DrinkMenuActivity : AppCompatActivity() {
         }
 
         if (favoriteIds.contains(itemId)) {
-            // Đã tồn tại -> xoá
             FavoriteDAO.removeFavorite(userId, itemId) { success, msg ->
                 runOnUiThread {
-                    Log.d("Fav", "favoriteIds=$favoriteIds, click itemId=$itemId")
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                     if (success) {
                         favoriteIds.remove(itemId)
@@ -141,7 +173,6 @@ class DrinkMenuActivity : AppCompatActivity() {
                 }
             }
         } else {
-            // Chưa có -> thêm
             FavoriteDAO.addFavorite(userId, itemId) { success, msg ->
                 runOnUiThread {
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
@@ -159,7 +190,6 @@ class DrinkMenuActivity : AppCompatActivity() {
         bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
-                    // Không dùng finish() để MainActivity load lại
                     startActivity(Intent(this, MainActivity::class.java))
                     overridePendingTransition(0, 0)
                     true
@@ -215,7 +245,6 @@ class DrinkMenuActivity : AppCompatActivity() {
         ItemDAO.getItemsByCategory(category) { success, message, items ->
             runOnUiThread {
                 showLoading(false)
-
                 if (success && items != null) {
                     allItems = items
                     displayedItems = items
@@ -310,9 +339,24 @@ class DrinkMenuActivity : AppCompatActivity() {
         }
     }
 
+    // --- 3. QUẢN LÝ VÒNG ĐỜI (LẮNG NGHE BROADCAST) ---
+    override fun onStart() {
+        super.onStart()
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            notificationReceiver,
+            IntentFilter(NotificationConstants.ACTION_NEW_ORDER)
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationReceiver)
+    }
+
     override fun onResume() {
         super.onResume()
         updateCartBadge()
+        updateBellUI() // Luôn cập nhật trạng thái chuông khi quay lại màn hình
 
         val userId = sessionManager.getUserId() ?: return
         FavoriteDAO.getFavoritesByUser(userId) { success, _, items ->
